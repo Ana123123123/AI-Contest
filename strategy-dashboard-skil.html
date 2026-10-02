@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>K.D.L — 이상지질혈증 치료제 파이프라인 전략 대시보드</title>
+<style>
+
+
+
+:root{
+  --bg:#f0f2f5; --surface:#ffffff; --border:#e2e8f0; --border2:#cbd5e1;
+  --text1:#0f172a; --text2:#475569; --text3:#94a3b8;
+  --mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+  --c-own:#2563eb; --c-dev:#059669; --c-plan:#d97706; --c-none:#94a3b8; --c-risk:#dc2626;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans','Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--text1);line-height:1.6}
+
+.topbar{background:var(--text1);padding:0 26px;display:flex;align-items:center;position:sticky;top:0;z-index:100;flex-wrap:wrap}
+.topbar-brand{font-size:12px;font-weight:700;letter-spacing:2px;color:#60a5fa;padding:16px 18px 16px 0;border-right:1px solid #334155;margin-right:4px;white-space:nowrap}
+.tab-btn{padding:14px 15px;font-size:11.5px;font-weight:600;color:#94a3b8;cursor:pointer;background:none;border:none;font-family:inherit;border-bottom:2px solid transparent}
+.tab-btn:hover{color:#e2e8f0}
+.tab-btn.active{color:#fff;border-bottom-color:#60a5fa}
+
+.wrap{max-width:1280px;margin:0 auto;padding:26px 22px 60px}
+.page{display:none}
+.page.active{display:block}
+
+.ph{background:var(--text1);color:#fff;border-radius:12px;padding:20px 24px;margin-bottom:20px}
+.ph-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:1.6px;color:#60a5fa;margin-bottom:8px}
+.ph-msg{font-size:19.5px;font-weight:800;line-height:1.45;letter-spacing:-.4px}
+.ph-msg em{font-style:normal;color:#fbbf24}
+.ph-sub{font-size:11.5px;color:#94a3b8;margin-top:9px}
+
+h3.sec{font-size:14px;font-weight:800;margin:26px 0 11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h3.sec::before{content:'';width:4px;height:15px;background:var(--c-own);border-radius:2px}
+h3.sec .n{font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:600}
+p.body{font-size:12.5px;color:var(--text2);margin:10px 0}
+.small{font-size:10.5px;color:var(--text3)}
+
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:6px}
+.kpi{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:13px 15px}
+.kpi .l{font-family:var(--mono);font-size:9.5px;color:var(--text3);letter-spacing:.4px;margin-bottom:6px}
+.kpi .v{font-size:21px;font-weight:900;letter-spacing:-.6px;line-height:1.15}
+.kpi .v small{font-size:12px;font-weight:700}
+.kpi .d{font-size:10.5px;color:var(--text2);margin-top:5px;line-height:1.5}
+
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:15px 17px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--border2)}
+.card.own::before{background:var(--c-own)}.card.dev::before{background:var(--c-dev)}
+.card.plan::before{background:var(--c-plan)}.card.risk::before{background:var(--c-risk)}
+.card.none::before{background:var(--c-none)}
+.card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px}
+.card-t{font-size:13px;font-weight:800;line-height:1.35}
+.card-m{font-family:var(--mono);font-size:9.5px;color:var(--text3);margin-bottom:9px;line-height:1.5}
+.card-b{font-size:11.5px;color:var(--text2);line-height:1.65}
+.card-b strong{color:var(--text1)}
+.vd{font-size:10px;font-weight:800;padding:2px 9px;border-radius:20px;white-space:nowrap}
+.v-own{background:#dbeafe;color:#1e40af}.v-dev{background:#dcfce7;color:#166534}
+.v-plan{background:#fef3c7;color:#b45309}.v-risk{background:#fee2e2;color:#b91c1c}
+.v-none{background:#f1f5f9;color:#64748b}
+
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:11.5px;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface)}
+th{padding:9px 11px;font-size:10px;font-weight:700;background:var(--text1);color:#fff;text-align:left;letter-spacing:.3px;vertical-align:bottom}
+td{padding:9px 11px;border-bottom:1px solid #f1f5f9;border-left:1px solid #f1f5f9;vertical-align:top;color:var(--text2);line-height:1.55}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:#f8fafc}
+td.k{font-weight:700;color:var(--text1);background:#f8fafc}
+.tag{display:inline-block;font-size:9px;font-weight:700;padding:1px 7px;border-radius:20px;white-space:nowrap}
+.t-kr{background:#dbeafe;color:#1e3a8a}.t-ok{background:#d1fae5;color:#065f46}
+.t-no{background:#f1f5f9;color:#64748b}.t-new{background:#fee2e2;color:#b91c1c}
+.t-warn{background:#fef3c7;color:#b45309}.t-chk{background:#ede9fe;color:#6d28d9}
+
+.call{border-left:4px solid var(--c-own);background:#eaf3ff;border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0;font-size:12.5px;color:#1e3a5f;line-height:1.7}
+.call.warn{border-left-color:var(--c-plan);background:#fff8ed;color:#7c4a12}
+.call.red{border-left-color:var(--c-risk);background:#fef2f2;color:#8c1d1d}
+.call b{font-weight:800}
+
+.score-row{display:grid;grid-template-columns:210px 1fr 66px 52px;gap:12px;align-items:center;padding:11px 14px;border-bottom:1px solid #f1f5f9}
+.score-row:last-child{border-bottom:none}
+.score-wrap{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
+.score-hd{display:grid;grid-template-columns:210px 1fr 66px 52px;gap:12px;padding:9px 14px;background:var(--text1);color:#fff;font-size:10px;font-weight:700}
+.sr-name{font-size:12px;font-weight:800;color:var(--text1);line-height:1.35}
+.sr-name span{display:block;font-family:var(--mono);font-size:9px;color:var(--text3);font-weight:600;margin-top:2px}
+.bars{display:flex;gap:4px}
+.bar{flex:1}
+.bar .bl{font-size:8.5px;color:var(--text3);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .bt{height:7px;background:#eef2f7;border-radius:4px;overflow:hidden}
+.bar .bf{height:100%;border-radius:4px;background:var(--c-own)}
+.sr-tot{font-size:17px;font-weight:900;text-align:right}
+.grade{font-size:11px;font-weight:900;text-align:center;padding:3px 0;border-radius:6px}
+.g-s{background:#fee2e2;color:#b91c1c}.g-a{background:#fef3c7;color:#b45309}
+.g-b{background:#dbeafe;color:#1e40af}.g-c{background:#f1f5f9;color:#64748b}
+
+.foot{margin-top:32px;padding-top:16px;border-top:1px solid var(--border);font-size:10.5px;color:var(--text3);line-height:1.85}
+.foot a{color:var(--c-own);text-decoration:none}
+.foot a:hover{text-decoration:underline}
+.pgnum{font-family:var(--mono);font-size:10px;color:var(--text3);text-align:right;margin-top:18px}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.grid3{grid-template-columns:1fr}}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}.score-row,.score-hd{grid-template-columns:1fr}}
+
+.ax{width:100%;height:auto;display:block}
+.ax text{font-family:var(--sans);fill:var(--text2)}
+.ax .axl{font-size:11px;font-weight:600;fill:var(--text3)}
+.ax .pt{font-size:11.5px;font-weight:700;fill:var(--text1)}
+.gatechip{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;padding:1px 6px;
+  border-radius:3px;background:var(--c-risk);color:#fff;margin-right:4px}
+.gatechip.ok{background:var(--c-dev)} .gatechip.chk{background:var(--c-plan)}
+
+/* ── v0 복원: 치료 축 배너 + 파이프라인 카드 ───────────────── */
+.axis{border-radius:12px;overflow:hidden;border:1.5px solid var(--border);margin:14px 0 18px;background:#f8fafc}
+.axis-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;color:#fff;flex-wrap:wrap}
+.axis-h .t{font-size:16px;font-weight:800;letter-spacing:-.2px}
+.axis-h .b{font-size:10.5px;font-weight:700;background:rgba(255,255,255,.93);padding:4px 12px;border-radius:20px;white-space:nowrap}
+.ax-ldl .axis-h{background:#2f4fd0} .ax-ldl .axis-h .b{color:#2f4fd0}
+.ax-lpa .axis-h{background:#7c3aed} .ax-lpa .axis-h .b{color:#7c3aed}
+.ax-tg .axis-h{background:#3f7089}  .ax-tg .axis-h .b{color:#3f7089}
+.ax-fh .axis-h{background:#c2610c}  .ax-fh .axis-h .b{color:#c2610c}
+.axis-b{padding:16px;display:grid;grid-template-columns:repeat(2,1fr);gap:14px;align-items:start}
+.pc{background:#fff;border:1.5px solid var(--border);border-top:3px solid var(--c-none);border-radius:10px;padding:14px 16px 15px}
+.pc.p3{border-top-color:#d97706} .pc.p2{border-top-color:#2563eb}
+.pc.mkt{border-top-color:#059669} .pc.fail{border-top-color:#dc2626}
+.pc-t{font-family:var(--mono);font-size:14.5px;font-weight:800;color:var(--text1);display:flex;align-items:center;gap:8px;flex-wrap:wrap;line-height:1.3}
+.pc-t .mech{font-family:'DM Sans','Noto Sans KR',sans-serif;font-size:10px;font-weight:700;background:#ede9fe;color:#5b21b6;padding:2px 9px;border-radius:20px}
+.pc-o{font-size:11.5px;font-weight:700;color:var(--text1);margin:7px 0 8px}
+.pc-o .cc{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--text3);margin-right:5px;letter-spacing:.5px}
+.pc-o em{font-style:normal;font-weight:500;color:var(--text3)}
+.pc-b{font-size:11.8px;color:var(--text2);line-height:1.65}
+.pc-b b{color:var(--text1);font-weight:700}
+.pcb{display:inline-block;margin-top:10px;font-size:10.5px;font-weight:700;padding:3px 11px;border-radius:20px}
+.pb-3{background:#fef3c7;color:#b45309} .pb-2{background:#dbeafe;color:#1e40af}
+.pb-m{background:#d1fae5;color:#065f46} .pb-f{background:#fee2e2;color:#b91c1c}
+@media(max-width:900px){.axis-b{grid-template-columns:1fr}}
+
+/* ── 영역 지형도 카드 ─────────────────────────────────────── */
+.acard{border:1.5px solid var(--border);border-radius:12px;overflow:hidden;background:#fff}
+.ac-h{padding:13px 17px;color:#fff}
+.ac-h .t{font-size:15.5px;font-weight:800;display:flex;align-items:center;gap:8px;flex-wrap:wrap;line-height:1.3}
+.ac-h .t .b{font-size:10px;font-weight:700;background:rgba(255,255,255,.93);padding:2px 10px;border-radius:20px}
+.ac-h .s{font-size:11px;opacity:.9;margin-top:5px;font-weight:500}
+.a-ldl .ac-h{background:#2f4fd0} .a-ldl .ac-h .t .b{color:#2f4fd0}
+.a-lpa .ac-h{background:#7c3aed} .a-lpa .ac-h .t .b{color:#7c3aed}
+.a-tg .ac-h{background:#3f7089}  .a-tg .ac-h .t .b{color:#3f7089}
+.a-fh .ac-h{background:#c2610c}  .a-fh .ac-h .t .b{color:#c2610c}
+.ac-r{display:grid;grid-template-columns:78px 1fr;gap:12px;padding:10px 17px;border-bottom:1px solid #f1f5f9;font-size:11.5px}
+.ac-r .l{color:var(--text3);font-weight:700;font-size:10.5px;padding-top:1px}
+.ac-r .v{color:var(--text2);line-height:1.62}
+.ac-r .v b{color:var(--text1);font-weight:700}
+.ptr{margin:11px 17px 15px;padding:9px 13px;border-radius:8px;font-size:11px;font-weight:700;background:#eef2ff;color:#3730a3;line-height:1.5}
+.ptr.g{background:#ecfdf5;color:#065f46} .ptr.o{background:#fff7ed;color:#9a3412}
+.ptr.p{background:#f5f3ff;color:#5b21b6}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">K.D.L · DYSLIPIDEMIA PIPELINE</div>
+  <button class="tab-btn active" onclick="switchTab(0)">① 경영진 요약</button>
+  <button class="tab-btn" onclick="switchTab(1)">② 지질 영역 지형도</button>
+  <button class="tab-btn" onclick="switchTab(2)">③ 국내 복합제 경쟁</button>
+  <button class="tab-btn" onclick="switchTab(3)">④ 신규 파이프라인</button>
+  <button class="tab-btn" onclick="switchTab(4)">⑤ 자체개발 기회</button>
+  <button class="tab-btn" onclick="switchTab(5)">⑥ 도입 우선순위</button>
+  <button class="tab-btn" onclick="switchTab(6)">⑦ 디지털 제품</button>
+</div>
+
+<div class="wrap">
+
+<div class="page active" id="pg0">
+  <div class="ph">
+    <div class="ph-eyebrow">TAB 01 · EXECUTIVE SUMMARY</div>
+    <div class="ph-msg">대웅은 2제 복합제로 이 영역의 <em>형태 공간을 스스로 다 채웠다</em> —<br>그래서 남은 문은 <em>3제 하나</em>이고, 그 문은 <em>벰페도익산 한국 판권</em>에 걸려 있다.</div>
+    <div class="ph-sub">이상지질혈증 치료제 · 자체개발 발굴 목적 · 공개자료 기준 2026.09.20 · 총 7탭 · <b>방법론 v2</b> <span class="small">(게이트 9개 + 3기준 15점) — 첫 적용</span></div>
+  </div>
+
+  <h3 class="sec"><span class="n">01</span> SCQA <span class="n">· 왜 지금 이 질문인가</span></h3>
+  <table>
+    <tr><td class="k" style="width:9%">S 상황</td><td>국내 스타틴 원외처방은 <b>2024년 3분기 6,766억원(+11.0%)</b>이고 스타틴·에제티미브 복합제 시장은 <b>1조 4천억원대</b>로 커졌다. 대웅제약은 이 영역에 <b>2제 복합제 4종 풀라인업</b>을 갖췄다 — 크레젯(로수바스타틴·에제티미브), 리토바젯(아토르바스타틴·에제티미브), <b>바로에젯(피타바스타틴 1mg·에제티미브 10mg, 2026.04 출시)</b>, 바로페노(피타바스타틴·페노피브레이트). 순환기 채널이 있고, 자체 3상까지 돌려본 카테고리다.</td></tr>
+    <tr><td class="k">C 복잡화</td><td>바로 그것이 문제다. <b>자사 보유 게이트에 걸려 2제는 더 만들 수 없다</b> — 같은 조합을 다시 내면 자기 잠식이다. 그런데 <b>2026년 9월 개정 진료지침</b>(ICoLA 2026)은 정반대 방향으로 갔다. LDL-C 55mg/dL 미만 대상이 재발성 뇌졸중 고위험군과 고위험 당뇨병 환자까지 <b>확대</b>됐고, 급성 관상동맥증후군에서는 <b>초기부터 최대용량 스타틴+에제티미브 병용</b>을 권고한다. <b>2제로 시작해서 목표에 못 닿는 환자가 구조적으로 늘어난다.</b></td></tr>
+    <tr><td class="k">Q 질문</td><td>2제를 다 가진 회사가 그 다음에 팔 것은 무엇인가?</td></tr>
+    <tr><td class="k">A 답</td><td><b>3제다. 그리고 국내에 지질 3제 복합제는 0건이다.</b> 고혈압을 섞은 3·4제(한미 아모잘탄큐·엑스큐, JW 리바로하이)는 있지만 <b>순수 지질 3제는 공개자료상 확인되지 않는다</b>. 제3의 성분으로 임상 근거가 가장 단단한 것은 <b>벰페도익산</b>이다 — 2026 지침에 처음 등재됐고(Class IIa, Level B), CLEAR Outcomes에서 <b>MACE 13% 감소</b>를 입증했으며 LDL을 추가로 <b>15~20%</b> 낮춘다. <b>다만 한국 판권이 열려 있는지가 확인되지 않았다.</b></td></tr>
+  </table>
+
+  <h3 class="sec"><span class="n">02</span> 결론 — 의사결정 4건</h3>
+
+  <div class="card own" style="margin-bottom:12px">
+    <div class="card-h"><div class="card-t">DECISION 01 — 이 영역의 첫 행동은 개발이 아니라 <b>판권 조회</b>다</div><div class="vd v-own">선결</div></div>
+    <div class="card-m">근거: 자체개발 후보 2건과 도입 후보 1건이 <b>전부 같은 판권 하나</b>에 걸려 있다</div>
+    <div class="card-b">벰페도익산(Esperion, 미국)은 <b>일본 판권이 오츠카제약에 독점 계약</b>돼 있다. 한국 판권의 배정 여부는 <b>공개자료상 확인되지 않는다</b>. 이 하나가 열리면 ⑤탭 A-1·A-2와 ⑥탭 1순위가 동시에 살아나고, 닫혀 있으면 <b>세 후보가 동시에 사라진다</b>. 비용이 거의 들지 않는 확인 작업이 나머지 모든 판단에 선행한다 — 항암 검토에서 아나모렐린이 ONO의 일본·한국·대만 독점권 때문에 자체개발과 도입이 <b>동시에</b> 막혔던 것과 같은 구조다.</div>
+  </div>
+
+  <div class="card dev" style="margin-bottom:12px">
+    <div class="card-h"><div class="card-t">DECISION 02 — 판권이 열리면 <b>스타틴+에제티미브+벰페도익산 3제</b>를 1순위로 한다</div><div class="vd v-plan">조건부</div></div>
+    <div class="card-m">근거: 국내 지질 3제 0건 · 2026 지침이 수요를 만들어 줌 · 자사가 2제 복합제를 네 번 만들어 봄</div>
+    <div class="card-b">대웅은 <b>스타틴 3종 각각에 에제티미브를 붙여 본 회사</b>다. 바로에젯은 국내 3상(N=129)에서 8주 LDL <b>43.9% 감소</b>(피타바스타틴 1mg 단독 29.1%)를 냈다. 복합제 설계·생동·허가를 반복 수행한 이력이 그대로 3제로 이어진다. <b>차별화 논리도 한 문장으로 선다</b> — "2제로 LDL 55에 못 닿는 환자에게, 주사 없이 알약 하나로 15~20%를 더 내린다."</div>
+  </div>
+
+  <div class="card plan" style="margin-bottom:12px">
+    <div class="card-h"><div class="card-t">DECISION 03 — <b>Lp(a) 표적 계열은 지금 사지 않는다</b></div><div class="vd v-no">배제</div></div>
+    <div class="card-m">근거: Lp(a)HORIZON 3상이 2026.09.04 <b>1차 평가변수 실패</b> — 불과 보름 전이다</div>
+    <div class="card-b">노바티스 펠라카르센은 <b>8,300명 이상</b>을 대상으로 한 3상에서 Lp(a)를 실제로 낮췄으나 <b>심혈관 사건 복합 위험을 줄이지 못했다</b>. 2026 지침이 Lp(a) 50mg/dL를 위험강화인자로 새로 넣은 직후에 나온 결과여서 더 중요하다 — <b>표지자로서의 가치와 표적으로서의 가치는 다르다</b>는 것이 임상으로 확인된 셈이다. 올파시란·레포디시란·젤라시란 등 후속 계열의 전망도 함께 흐려졌다. 이 시점에 지역 판권을 사는 것은 <b>남의 실패 리스크를 대신 떠안는 것</b>이다.</div>
+  </div>
+
+  <div class="card risk" style="margin-bottom:12px">
+    <div class="card-h"><div class="card-t">DECISION 04 — 하지 않을 것: <b>2제 복합제 추가 · 경구 PCSK9 자체개발</b></div><div class="vd v-no">배제</div></div>
+    <div class="card-b">① <b>스타틴+에제티미브 2제 신규</b> — 자사 보유 게이트 탈락. 대웅이 이미 세 조합을 판다. ② <b>경구 PCSK9</b> — MSD 엔리시타이드(Lipfendra)가 <b>2026.07.16 FDA 승인</b>으로 계열 최초 자리를 가져갔고 특허가 존속한다. 다국적사가 직접 들어올 품목이라 도입 가능성도 낮다. 다만 이 약은 <b>아침 공복 복용 + 30분 금식</b>을 요구한다 — 우리가 아비라테론 검토에서 다뤘던 바로 그 결함이며, <b>특허 만료 시점을 트리거로 걸어 둔다</b>.</div>
+  </div>
+
+  <h3 class="sec"><span class="n">03</span> 듣는 사람이 물을 4가지</h3>
+  <table>
+    <tr><th style="width:26%">예상 질문</th><th>답</th></tr>
+    <tr><td class="k">"2제를 네 개나 가졌는데 왜 후보가 2건뿐인가?"</td><td><b>많이 가졌기 때문에 적은 것이다.</b> 이 영역에서 형태(B트랙)를 채운 것이 바로 우리다 — 스타틴 3종 × 에제티미브, 그리고 피타바스타틴 × 페노피브레이트. 남의 공백이 아니라 <b>우리가 만든 포화</b>다. 그래서 남은 방향은 성분을 더하는 것(A트랙) 하나이고, 후보가 적은 것이 아니라 <b>문이 하나로 좁혀진 것</b>이다.</td></tr>
+    <tr><td class="k">"페노피브레이트로 3제를 만들면 안 되나? 바로페노가 있는데."</td><td>만들 수는 있으나 <b>지금 지침이 요구하는 것과 어긋난다</b>. 2026 개정의 방향은 LDL-C를 더 낮추는 것이고, 페노피브레이트는 <b>LDL 강하 근거가 약하다</b>(중성지방 관리 약제다). 임상적 타당성 게이트에서 내려 <b>관찰 트랙</b>으로 보냈다 — TG 동반 고위험군을 겨냥한 별도 적응증 근거가 나오면 다시 올린다(⑤탭 비제안표).</td></tr>
+    <tr><td class="k">"점수 체계가 왜 15점으로 바뀌었나?"</td><td>어제 방법론 감사에서 <b>기존 25점 체계의 차별화강도-총점 상관이 −0.11</b>로 나왔다. 후보를 무효로 만드는 변수(자사적합성·도입가능성·특허)를 감점 항목으로 처리한 것이 원인이어서, <b>그 셋을 게이트로 올리고 3기준 15점</b>으로 바꿨다. 이 문서가 첫 적용이다. <b>기존 6종(25점)과 총점을 나란히 비교하지 말 것.</b></td></tr>
+    <tr><td class="k">"시장 숫자는 믿을 만한가?"</td><td>스타틴 원외처방 6,766억원(2024년 3분기)과 품목별 수치는 공개 집계 보도 기준이다. <b>대웅 4개 품목의 실제 처방액은 확보하지 못했다</b> — 상위 품목 집계에 나타나지 않아 규모를 추정하지 않았다. <b>UBIST 대조가 필요하다(PM 입력 영역)</b>. 시장성 점수는 그때까지 공개자료 기준 잠정치다.</td></tr>
+  </table>
+
+  <h3 class="sec"><span class="n">04</span> 이 문서의 기준일과 트리거</h3>
+  <div class="call warn">
+    <b>이 문서는 2026년 9월 20일 공개자료 기준이며, 아래 3건의 확인이 완료되면 재작성한다.</b><br><br>
+    ① <b>벰페도익산 한국 판권 배정 여부</b> — 확인 주체: 사업개발 · 기한: <b>2026년 10월 31일</b>. 이 답에 따라 ⑤탭 2건과 ⑥탭 1순위가 동시에 살거나 죽는다.<br>
+    ② <b>자사 4개 품목의 규격 라인업</b>(고함량·저함량 보유 현황) — 확인 주체: PM · 기한: <b>2026년 10월 15일</b>. 자사 보유 게이트의 정확한 경계가 여기서 정해진다.<br>
+    ③ <b>대웅 4종 UBIST 처방액</b> — 확인 주체: PM · 기한: <b>2026년 10월 31일</b>. 시장성 점수의 잠정 표기를 풀기 위한 것이다.<br><br>
+    <b>기한 없는 트리거는 트리거가 아니다.</b> 앞선 검토에서 "2026년 9월 중 확인"이라고만 적어 둔 항목의 답이 한 달 전에 나와 있었는데 문서가 모른 채 배포된 사고가 있었다.
+  </div>
+
+  <div class="pgnum">— TAB 1 / 7 —</div>
+</div>
+
+<div class="page" id="pg1">
+
+  <div class="ph">
+    <div class="ph-eyebrow">TAB 02 · LANDSCAPE</div>
+    <div class="ph-msg">이 영역은 특허가 거의 다 열려 있다 — <em>그래서 특허는 변별력이 없다</em>.<br>기회를 가르는 축은 <em>LDL을 더 내릴 수 있는가</em> 하나다.</div>
+    <div class="ph-sub">치료 목표 4영역 · 지질강하 6계열 MECE · 특허 개방도와 LDL 추가강하력 병기 · 2026 개정 지침 반영</div>
+  </div>
+
+  <h3 class="sec"><span class="n">01</span> 분류 기준 — 왜 이렇게 나눴는가</h3>
+  <p style="font-size:12.5px;color:var(--text2);line-height:1.75;margin:0 0 14px">
+    앞선 다섯 영역에서는 <b>① 특허가 열렸는가 ② 흡수·투여에 결함이 있는가</b> 두 축을 썼다. 이상지질혈증에서는 첫 축이 작동하지 않는다 —
+    <b>주력 성분이 거의 전부 특허 만료 상태</b>여서 개방도가 상수에 가깝다. 대신 2026 개정 지침이 새 축을 만들어 줬다.
+    LDL-C 55mg/dL 대상이 확대되고 ACS에서 초기 병용이 권고되면서, <b>"2제 위에 무엇을 더 얹어 LDL을 추가로 내릴 수 있는가"</b>가 실질 분류축이 됐다.
+    아래 <b>02절은 치료 목표로</b>(환자가 무엇 때문에 오는가), <b>03절은 약물 계열로</b>(우리가 무엇을 만들 수 있는가) 두 번 자른다 — 두 축이 만나는 칸이 후보다.
+  </p>
+
+  <div class="kpis">
+    <div class="kpi own"><div class="l">스타틴 원외처방</div><div class="v">6,766억</div><div class="d">2024년 3분기 · 전년비 +11.0%</div></div>
+    <div class="kpi own"><div class="l">스타틴·에제티미브 복합제</div><div class="v">1.4조</div><div class="d">시장 집계 보도 기준</div></div>
+    <div class="kpi dev"><div class="l">특허 개방 계열</div><div class="v">4/6</div><div class="d">스타틴 · 에제티미브 · 피브레이트 · 오메가3</div></div>
+    <div class="kpi plan"><div class="l">국내 지질 3제</div><div class="v">0건</div><div class="d">고혈압 혼합 3·4제만 존재</div></div>
+    <div class="kpi risk"><div class="l">자사 보유 복합제</div><div class="v">4종</div><div class="d">전부 2제 · B트랙 자가 포화</div></div>
+  </div>
+
+  <h3 class="sec"><span class="n">02</span> 치료 목표별 지형 <span class="small">· 환자가 무엇 때문에 오는가</span></h3>
+  <div class="grid2">
+
+    <div class="acard a-ldl">
+      <div class="ac-h">
+        <div class="t">💊 ① LDL-C 저하 <span class="b">핵심 축</span></div>
+        <div class="s">고LDL콜레스테롤혈증 · ASCVD 1·2차 예방의 근간</div>
+      </div>
+      <div class="ac-r"><div class="l">치료 표준</div><div class="v"><b>스타틴 1차</b> → 에제티미브 → PCSK9i/인클리시란 → 벰페도익산 · 목표 2차예방 <b>&lt;55mg/dL</b></div></div>
+      <div class="ac-r"><div class="l">시판 약제</div><div class="v"><b>스타틴</b> 로수바스타틴·아토르바스타틴·피타바스타틴·프라바스타틴 · <b>흡수억제</b> 에제티미브 · <b>PCSK9i</b> 에볼로쿠맙·알리로쿠맙·인클리시란·엔리시타이드(경구) · <b>ACL</b> 벰페도익산(국내 미발매)</div></div>
+      <div class="ac-r"><div class="l">동향</div><div class="v">목표 강화로 <b>병용·복합제 수요 증가</b> · 경구 PCSK9 2026.07 승인 · CETP 진입 임박</div></div>
+      <div class="ac-r"><div class="l">미충족</div><div class="v">주사 부담(경구화) · <b>목표 미달성군</b> · 스타틴 불내성</div></div>
+      <div class="ac-r"><div class="l">자사 위치</div><div class="v">크레젯 · 리토바젯 · 바로에젯 <b>3종 보유 — 2제 조합 공간을 스스로 채웠다</b></div></div>
+      <div class="ptr">▶ 경구·복합제 경쟁 영역 — 계열별 심층분석 <b>③탭</b> · 남은 문은 3제 하나 <b>⑤탭 A트랙</b></div>
+    </div>
+
+    <div class="acard a-lpa">
+      <div class="ac-h">
+        <div class="t">🧬 ② Lp(a) 저하 <span class="b">신영역</span></div>
+        <div class="s">지단백(a) 상승 · 유전적 잔여 심혈관 위험인자</div>
+      </div>
+      <div class="ac-r"><div class="l">치료 표준</div><div class="v"><b>승인 치료제 부재</b> · 스타틴·에제티미브는 Lp(a)를 낮추지 못한다 · 2026 지침 <b>전 성인 1회 측정 권고</b>(신규)</div></div>
+      <div class="ac-r"><div class="l">시판 약제</div><div class="v">현재 없음 <b>(미충족 100%)</b> · CETP(오베체트라핍)가 부수적으로 Lp(a)를 낮춘다</div></div>
+      <div class="ac-r"><div class="l">파이프라인</div><div class="v">ASO · siRNA · <b>경구 소분자</b> — 최대 94% 감소 입증 · CVOT 2026~2029 대기</div></div>
+      <div class="ac-r"><div class="l">2026.09</div><div class="v"><b>Lp(a)HORIZON(ASO) 1차 평가변수 실패</b> — Lp(a)는 낮췄으나 심혈관 사건이 줄지 않았다. <b>표지자로서의 가치와 표적으로서의 가치는 다르다.</b></div></div>
+      <div class="ac-r"><div class="l">기회</div><div class="v">완전 미개척 시장이었으나 <b>표적 가설이 흔들렸다</b> — 계열 전체가 아니라 <b>모달리티별로</b> 다시 본다</div></div>
+      <div class="ptr p">▶ 개별 품목 5건과 세 개의 분기점 날짜 — <b>④탭 축 ②</b></div>
+    </div>
+
+    <div class="acard a-tg">
+      <div class="ac-h">
+        <div class="t">🔥 ③ 중성지방(TG) 저하 <span class="b">잔여 위험</span></div>
+        <div class="s">고중성지방혈증 · 잔여 심혈관 위험 · 췌장염 위험</div>
+      </div>
+      <div class="ac-r"><div class="l">치료 표준</div><div class="v">생활습관·스타틴 우선 · 고TG 시 <b>icosapent ethyl · 피브레이트</b></div></div>
+      <div class="ac-r"><div class="l">시판 약제</div><div class="v">페노피브레이트 · 스타틴+피브레이트 복합(프라바페닉스 2012 · 스타펜 2019 · <b>바로페노</b>) · 오메가3</div></div>
+      <div class="ac-r"><div class="l">동향</div><div class="v"><b>2026 지침의 방향은 LDL을 더 낮추는 쪽</b>이다 — TG는 부차 축으로 밀렸다</div></div>
+      <div class="ac-r"><div class="l">자체개발</div><div class="v"><b>조건부.</b> 스타틴+에제티미브+페노피브레이트 3제는 구성이 성립하고 국내 0건이지만, <b>지침 방향과 어긋나</b> 임상 타당성 게이트에서 내렸다</div></div>
+      <div class="ptr o">▶ 다시 논의할 조건 — <b>TG 동반 고위험군 적응증</b>으로 재설계하고 그 환자군에서 심혈관 결과 근거가 확보될 때 <b>⑤탭 비제안표</b></div>
+    </div>
+
+    <div class="acard a-fh">
+      <div class="ac-h">
+        <div class="t">🧪 ④ 특수병태 · 가족성 <span class="b">희귀·중증</span></div>
+        <div class="s">가족성 고콜레스테롤혈증(FH) · 중증 유전성 지질질환</div>
+      </div>
+      <div class="ac-r"><div class="l">치료 표준</div><div class="v"><b>조기·강력 LDL 저하</b> · HoFH는 특수치료 · 가이드라인이 <b>FH 조기 약물치료를 권고</b></div></div>
+      <div class="ac-r"><div class="l">시판 약제</div><div class="v">PCSK9i 중심 · HoFH 특수치료제의 <b>국내 접근성은 공개자료상 확인되지 않음</b> <span class="tag t-chk">PM 확인</span></div></div>
+      <div class="ac-r"><div class="l">동향</div><div class="v">경구 PCSK9이 <b>HeFH 적응증까지 승인</b>받았다(CORALreef HeFH) — 주사 부담이 큰 환자군이라 영향이 크다</div></div>
+      <div class="ac-r"><div class="l">자체개발</div><div class="v"><b>없음.</b> 주력 약제가 전부 특허 존속이고 모달리티도 항체·siRNA다 — 특허·제조 두 게이트가 동시에 막는다</div></div>
+      <div class="ptr g">▶ 관찰 트랙 — 경구 PCSK9 <b>국내 허가 신청·급여 등재 조건</b> <b>⑥탭 관찰 항목</b></div>
+    </div>
+
+  </div>
+
+  <h3 class="sec"><span class="n">03</span> 계열별 판단 <span class="small">· 우리가 무엇을 만들 수 있는가</span></h3>
+  <table>
+    <tr><th style="width:13%">계열</th><th style="width:20%">주요 성분</th><th style="width:15%">특허 개방도</th><th style="width:15%">LDL 추가강하력</th><th>자체개발 여지</th></tr>
+    <tr>
+      <td class="k">① 스타틴</td>
+      <td>로수바스타틴 · 아토르바스타틴 · 피타바스타틴 · 프라바스타틴</td>
+      <td><b>완전 개방</b><br><span class="small">제네릭 다수 · 가격 경쟁 단계</span></td>
+      <td><b>기저 요법</b><br><span class="small">여기가 출발선이지 추가분이 아니다</span></td>
+      <td><b>없음.</b> 자사 보유 + 경쟁 밀도 두 게이트가 동시에 막는다.</td>
+    </tr>
+    <tr>
+      <td class="k">② 에제티미브</td>
+      <td>에제티미브 단일 · 스타틴 복합</td>
+      <td><b>개방</b><br><span class="small">복합제 1.4조 시장 형성</span></td>
+      <td><b>약 20%</b><br><span class="small">스타틴 대비 추가</span></td>
+      <td><b>없음(자사 보유).</b> 대웅이 크레젯·리토바젯·바로에젯 <b>세 조합을 모두 판다</b>. 재제안은 자기 잠식이다.</td>
+    </tr>
+    <tr>
+      <td class="k">③ 벰페도익산</td>
+      <td>벰페도익산 · 벰페도익산+에제티미브</td>
+      <td><b>판권 미확인</b><br><span class="small">Esperion(미국) · 일본은 오츠카 독점</span></td>
+      <td><b>15~20%</b><br><span class="small">CLEAR Outcomes MACE −13%</span></td>
+      <td><b>최상 — 단, 판권에 걸려 있다.</b> 2026 지침 신규 등재(Class IIa, Level B). ACL 억제제로 <b>근육 부작용이 적어</b> 스타틴 불내성에도 쓴다. ⑤탭 A-1·A-2의 제3성분이 전부 이것이다.</td>
+    </tr>
+    <tr>
+      <td class="k">④ PCSK9 계열</td>
+      <td>에볼로쿠맙 · 알리로쿠맙 · 인클리시란 · <b>엔리시타이드(경구)</b></td>
+      <td><b>특허 존속</b><br><span class="small">전 품목</span></td>
+      <td><b>50~60%</b><br><span class="small">가장 강력</span></td>
+      <td><b>없음(자체개발).</b> 특허 게이트 탈락. 엔리시타이드는 2026.07.16 FDA 승인으로 계열 최초 경구를 선점했다. ⑥탭 관찰 대상.</td>
+    </tr>
+    <tr>
+      <td class="k">⑤ 피브레이트</td>
+      <td>페노피브레이트 · 스타틴 복합</td>
+      <td><b>완전 개방</b><br><span class="small">프라바페닉스(2012) · 스타펜(2019) · 바로페노</span></td>
+      <td><b>근거 약함</b><br><span class="small">중성지방 관리 약제 — LDL 강하가 주작용이 아니다</span></td>
+      <td><b>조건부.</b> 3제 구성은 가능하나 <b>2026 지침의 방향(LDL을 더 낮춘다)과 어긋난다.</b> 임상적 타당성 게이트에서 내려 관찰 트랙으로 보냈다.</td>
+    </tr>
+    <tr>
+      <td class="k">⑥ 오메가3 · 기타</td>
+      <td>오메가3 · CETP 억제제(오베체트라핍) · Lp(a) 표적</td>
+      <td><b>개방</b> / <b>특허 존속</b><br><span class="small">성분별 상이</span></td>
+      <td><b>없음~검증 중</b><br><span class="small">오메가3는 LDL 강하 없음 · Lp(a)는 ASO 3상 실패</span></td>
+      <td><b>없음.</b> 오메가3는 결함 축이 ×, Lp(a)는 <b>2026.09.04 Lp(a)HORIZON 1차 실패</b>로 ASO 경로가 막혔다(④탭 — 단 siRNA·경구는 결과 대기).</td>
+    </tr>
+  </table>
+
+  <h3 class="sec"><span class="n">04</span> 자사 데이터가 채워야 할 칸 <span class="small">· UBIST · IQVIA를 올려 주시면 여기가 채워진다</span></h3>
+  <div class="call warn">
+    <b>이 문서는 공개자료만으로 만들었다.</b> 위 숫자 중 시장 규모는 <b>보도·집계 기준</b>이고, <b>자사 처방액은 한 줄도 들어 있지 않다.</b>
+    아래 셋을 올려 주시면 <b>잠정 표기가 풀리고 판단이 바뀔 수 있는 칸이 세 군데</b> 있다 — 어느 칸이 어떻게 달라지는지 먼저 적어 둔다.
+  </div>
+  <table>
+    <tr><th style="width:22%">올려 주실 데이터</th><th style="width:30%">지금은 이렇게 적혀 있다</th><th>들어오면 이것이 달라진다</th></tr>
+    <tr>
+      <td class="k"><b>① UBIST 자사 4종 처방액</b><br><span class="small">크레젯 · 리토바젯 · 바로에젯 · 바로페노</span></td>
+      <td>"자사 보유 복합제 4종" — <b>개수만 있고 금액이 없다.</b> 상위 집계에 자사 품목이 잡히지 않는 이유가 규모 때문인지 집계 기준 때문인지 모른다</td>
+      <td><b>⑤탭 시장성 점수의 잠정 표기가 풀린다.</b> 그리고 <b>자기 잠식의 크기</b>가 처음으로 숫자가 된다 — 3제가 2제를 얼마나 잠식하는지는 지금 추정도 못 한다</td>
+    </tr>
+    <tr>
+      <td class="k"><b>② 자사 4종 규격 라인업</b><br><span class="small">성분별 함량 전수</span></td>
+      <td>B트랙을 <b>"자가 포화"</b>로 판정했다 — 다만 이것은 <b>조합 기준</b>이지 <b>규격 기준</b>이 아니다</td>
+      <td><b>자사 보유 게이트의 정확한 경계가 정해진다.</b> 고함량 규격이 비어 있으면 <b>B트랙이 다시 열린다</b> — 지금은 닫혀 있다고 쓴 상태다</td>
+    </tr>
+    <tr>
+      <td class="k"><b>③ IQVIA 영역별 시장 규모</b><br><span class="small">계열별·세그먼트별 점유</span></td>
+      <td>스타틴 6,766억 · 복합제 1.4조는 <b>보도 인용치</b>다. 02절 네 영역 중 <b>TG·특수병태는 규모 자체가 비어 있다</b></td>
+      <td><b>02절 네 영역의 우선순위가 근거를 갖는다.</b> 지금은 "LDL이 핵심 축"이 지침 근거뿐이고 <b>금액 근거가 없다</b></td>
+    </tr>
+  </table>
+  <div class="call">
+    <b>왜 이 표를 문서 안에 두는가.</b> "확인 필요"라고만 적어 두면 아무도 채우지 않는다.
+    <b>무엇이 비어 있고, 채우면 어느 판단이 어떻게 달라지는지</b>를 같은 화면에 적어야 채울 이유가 생긴다.
+    ①②③은 ①탭 트리거에 <b>주체와 기한</b>이 붙어 있다 — PM ~2026.10.15 / ~2026.10.31.
+  </div>
+
+  <h3 class="sec"><span class="n">05</span> So What? — 지형도가 말하는 한 문장</h3>
+  <div class="call">
+    <b>여섯 계열 중 "특허가 열려 있고 · LDL을 더 내리고 · 국내에 없는" 칸은 ③벰페도익산 하나다.</b>
+    ①②는 자사가 이미 갖고 있어 막혔고, ④는 특허가 지키고 있으며, ⑤는 지침의 방향과 다르고, ⑥은 근거가 없거나 방금 무너졌다.
+    <b>이 영역의 자체개발 판단은 계열 선택 문제가 아니라 판권 확보 문제로 수렴한다.</b>
+  </div>
+  <div class="call warn">
+    <b>Why So? — 왜 축이 달라졌나</b><br>
+    앞선 영역들에서는 "오래된 약일수록 특허가 열려 있고 동시에 제형이 낡았다"는 규칙이 성립했다. 이상지질혈증은 예외다 —
+    <b>스타틴은 오래됐지만 제형이 낡지 않았다.</b> 1일 1회 경구정이고 흡수 결함이 없다. 개량할 대상 자체가 없어서
+    지난 20년간 이 영역의 혁신은 전부 <b>"무엇을 더할 것인가"</b>로 갔고, 그 결과가 복합제 1.4조 시장이다.
+    <b>제형 축이 닫힌 영역에서는 조합 축이 유일한 문이 된다</b> — 이것이 A트랙이 처음으로 주전장이 되는 이유다.
+  </div>
+
+  <div class="pgnum">— TAB 2 / 7 —</div>
+</div>
+
+<div class="page" id="pg2">
+  <div class="ph">
+    <div class="ph-eyebrow">TAB 03 · DEEP-DIVE · 국내 복합제 경쟁</div>
+    <div class="ph-msg">2제 시장은 <em>성장하면서 동시에 닫혔다</em> —<br>복합제만 두 자리로 크는데, 조합의 빈 칸은 <em>더 이상 없다</em>.</div>
+    <div class="ph-sub">스타틴·에제티미브 복합제 경쟁 · 자사 4종 위치 · 3제 공백의 실체</div>
+  </div>
+
+  <h3 class="sec"><span class="n">01</span> 단일제는 빠지고 복합제만 큰다 <span class="n">· 2024년 3분기 원외처방</span></h3>
+  <div class="tw" style="overflow-x:auto">
+  <table>
+    <tr><th style="width:18%">품목</th><th style="width:16%">제약사</th><th style="width:13%">구성</th><th style="width:15%">3분기 처방액</th><th style="width:11%">성장률</th><th>의미</th></tr>
+    <tr><td class="k">로수젯</td><td>한미약품</td><td>로수바스타틴+에제티미브</td><td class="k">535억</td><td><span class="tag t-ok">+17.5%</span></td><td><b>1위.</b> 국내사 개발 전문의약품 처방 1위를 이어 가는 품목</td></tr>
+    <tr><td class="k">리바로</td><td>JW중외제약</td><td>피타바스타틴 단일</td><td class="k">243억</td><td><span class="tag t-plan">+4.3%</span></td><td>단일제 중 예외적으로 성장 — 피타바스타틴 계열 자체의 확대</td></tr>
+    <tr><td class="k">리바로젯</td><td>JW중외제약</td><td>피타바스타틴+에제티미브</td><td class="k">240억</td><td><span class="tag t-ok">+32.1%</span></td><td><b>가장 빠르게 큰다.</b> 피타바스타틴 복합제 수요가 실재함을 보여 준다</td></tr>
+    <tr><td class="k">리피토</td><td>비아트리스</td><td>아토르바스타틴 단일</td><td class="k">471억</td><td><span class="tag t-no">−2.2%</span></td><td rowspan="2"><b>단일제는 줄고 그 복합제는 는다.</b> 같은 성분 안에서 처방이 <b>단일제 → 복합제로 이동</b>하고 있다는 직접 증거다</td></tr>
+    <tr><td class="k">리피토플러스</td><td>비아트리스·제일약품</td><td>아토르바스타틴+에제티미브</td><td class="k">102억</td><td><span class="tag t-ok">+48.0%</span></td></tr>
+    <tr><td class="k">크레스토</td><td>아스트라제네카</td><td>로수바스타틴 단일</td><td class="k">216억</td><td><span class="tag t-no">−2.8%</span></td><td>오리지널 단일제의 전형적 곡선</td></tr>
+  </table>
+  </div>
+  <p class="small" style="margin-top:8px">※ 스타틴 전체 원외처방 <b>6,766억원(+11.0%)</b> · 처방량 9억314만정(+10.7%) 기준. 집계 보도 자료이며 <b>대웅 4개 품목은 상위 집계에 나타나지 않아 규모를 추정하지 않았다</b> — UBIST 대조 필요(PM 입력 영역).</p>
+
+  <h3 class="sec"><span class="n">02</span> 자사 라인업의 위치 — 넓지만 얕다</h3>
+  <div class="tw" style="overflow-x:auto">
+  <table>
+    <tr><th style="width:16%">제품</th><th style="width:22%">성분</th><th style="width:16%">겨냥 환자군</th><th>본 검토와의 관계</th></tr>
+    <tr><td class="k">크레젯</td><td>로수바스타틴+에제티미브</td><td>ASCVD·ACS 고위험군</td>
+      <td rowspan="4"><b>네 품목이 뜻하는 바는 두 가지다.</b><br><br>
+      ① <b>A트랙 실행 역량의 직접 증거다.</b> 스타틴 3종 각각에 에제티미브를 붙이고, 여기에 피브레이트 조합까지 만들었다. <b>바로에젯은 자체 3상(국내 원발성 고콜레스테롤혈증 129명)을 돌려 8주 LDL 43.9% 감소</b>(피타바스타틴 1mg 단독 29.1%)를 입증했다. 복합제 처방 설계·생동·허가를 <b>네 번 반복한 조직</b>이 3제로 가는 것은 인접 이동이다.<br><br>
+      ② <b>동시에 2제 공간을 스스로 닫았다.</b> 자사 보유 게이트가 세 조합 전부를 막는다. 남은 것은 성분을 더하는 방향뿐이다.<br><br>
+      <b>단서:</b> 각 품목의 <b>규격 라인업(고함량·저함량 보유 현황)은 확인하지 못했다.</b> 자사 보유 게이트의 정확한 경계가 여기서 정해지므로 ①탭 트리거 ②로 걸어 두었다.</td></tr>
+    <tr><td class="k"><b>바로에젯</b><br><span class="small">2026.04 출시</span></td><td>피타바스타틴 1mg + 에제티미브 10mg</td><td>저·중등도 위험군</td></tr>
+    <tr><td class="k">리토바젯</td><td>아토르바스타틴+에제티미브</td><td>CKD(만성콩팥병) 동반 환자</td></tr>
+    <tr><td class="k">바로페노</td><td>피타바스타틴+페노피브레이트</td><td>복합형 이상지질혈증</td></tr>
+  </table>
+  </div>
+
+  <h3 class="sec"><span class="n">03</span> 3제의 실체 — 있는 것과 없는 것</h3>
+  <table>
+    <tr><th style="width:24%">3제 이상 조합</th><th style="width:20%">국내 현황</th><th>판정</th></tr>
+    <tr><td class="k">고혈압 + 스타틴 3·4제</td><td><span class="tag t-no">선점</span><br><span class="small">한미 아모잘탄큐(CCB·ARB·로수바스타틴) · 아모잘탄엑스큐(+에제티미브 4제) · JW 리바로하이</span></td>
+      <td><b>진입하지 않는다.</b> 이 칸은 고혈압 복합제 강자가 이미 가져갔고, 4제까지 나와 빈 칸이 없다.</td></tr>
+    <tr><td class="k">스타틴 + 에제티미브 + 벰페도익산</td><td><span class="tag t-kr">0건</span><br><span class="small">공개자료상 국내외 동일 조합 확인되지 않음</span></td>
+      <td><b>⑤탭 A-1.</b> 세 성분 모두 LDL을 내리고, 기전이 겹치지 않는다(HMG-CoA 환원효소 / 흡수 억제 / ACL). <b>지침이 요구하는 방향과 정확히 일치한다.</b></td></tr>
+    <tr><td class="k">에제티미브 + 벰페도익산 2제</td><td><span class="tag t-plan">해외만</span><br><span class="small">넥슬리젯(Esperion) · 국내 미발매</span></td>
+      <td><b>⑤탭 A-2.</b> 스타틴을 빼므로 <b>자기 잠식이 아니다.</b> 2026 지침이 스타틴 불내성 환자에 벰페도익산을 Class IIa로 권고한 자리를 그대로 겨냥한다.</td></tr>
+    <tr><td class="k">스타틴 + 에제티미브 + 페노피브레이트</td><td><span class="tag t-kr">0건</span><br><span class="small">2제 조합(프라바페닉스 2012 · 스타펜 2019 · 바로페노)은 다수</span></td>
+      <td><b>관찰로 내린다.</b> 조합은 가능하나 페노피브레이트의 <b>LDL 강하 근거가 약해</b> "LDL 55 달성"이라는 이 문서의 논리와 맞지 않는다. ⑤탭 비제안표 참조.</td></tr>
+    <tr><td class="k">스타틴 + 에제티미브 + 오메가3</td><td><span class="tag t-kr">0건</span><br><span class="small">스타틴+오메가3 2제는 로수메가(건일, 2017)</span></td>
+      <td><b>배제.</b> 오메가3는 <b>LDL을 낮추지 않는다.</b> 결함 축이 ×여서 3제 논리가 성립하지 않는다.</td></tr>
+  </table>
+
+  <div class="call red">
+    <b>So What?</b> — 3제 칸이 비어 있는 이유는 아무도 생각을 못 해서가 아니다. <b>제3의 성분으로 쓸 만한 경구 지질강하제가 최근까지 없었기 때문</b>이다.
+    피브레이트와 오메가3는 LDL을 내리지 못하고, PCSK9 계열은 주사제이거나 특허가 살아 있었다.
+    <b>벰페도익산이 2026년 지침에 처음 등재되면서 비로소 세 번째 칸에 넣을 성분이 생겼다</b> — 그래서 이 기회는 오래 열려 있지 않다.
+  </div>
+
+  <div class="pgnum">— TAB 3 / 7 —</div>
+</div>
+
+<div class="page" id="pg3">
+
+  <div class="ph">
+    <div class="ph-eyebrow">TAB 04 · EMERGING PIPELINE</div>
+    <div class="ph-msg">두 주 사이에 <em>하나는 승인됐고 하나는 무너졌다</em> —<br>경구 PCSK9은 계열 최초를 가져갔고, <em>Lp(a)는 3상에서 실패</em>했다.</div>
+    <div class="ph-sub">치료 축별 스크리닝 · 성분명(영문)·개발사·국가·개발단계 · 공개 임상 기반 2026.09 · <b>이 탭은 판정하지 않는다</b> <span class="small">(판정은 ⑤⑥탭 소관)</span></div>
+  </div>
+
+  <div class="call">
+    <b>이 탭은 지도이지 결론이 아니다.</b> 후보를 걸러내고 순위를 매기는 것은 ⑤탭(자체개발)과 ⑥탭(도입)이 한다.
+    여기서는 <b>이 영역이 어디로 가고 있는가</b>만 본다 — 그래서 뒤에서 탈락시킬 품목도 지우지 않고 <b>기전 축 위에 그대로 남긴다.</b><br>
+    <b>축은 기전으로 고정한다.</b> 개발 단계나 승인 여부로 나누면 다음 갱신 때 <b>행이 칸을 옮겨 다녀</b> 작년 문서와 나란히 볼 수 없게 된다.
+    이미 승인·시판된 품목(벰페도익산·인클리시란)은 이 탭이 아니라 <b>②탭 지형도와 ⑥탭 도입</b>에서 다룬다.
+  </div>
+
+  <h3 class="sec"><span class="n">01</span> 최근 6개월에 일어난 두 사건</h3>
+  <div class="grid2">
+    <div class="card dev">
+      <div class="card-h"><div class="card-t">승인 — 경구 PCSK9이 문을 열었다</div><div class="vd v-dev">2026.07.16 FDA</div></div>
+      <div class="card-m">LIPFENDRA<sup>®</sup>(엔리시타이드 데카노에이트) · MSD(미국)</div>
+      <div class="card-b">
+        CORALreef Lipids(NCT05952856)·CORALreef HeFH(NCT05952869) 3상에서 LDL-C를 <b>약 60% 감소</b>시켰고 52주까지 유지됐다. ApoB도 50% 이상 감소.
+        <b>주사제와 같은 수준의 강하력을 알약으로 냈다</b>는 점이 이 승인의 의미다.<br><br>
+        <b>다만 라벨에 제약이 붙었다.</b> 20mg 1정을 <b>매일 아침 공복</b>에 물·블랙커피·플레인티와 복용하고, 복용 후 <b>최소 30분간 음식과 다른 음료를 피해야</b> 한다.
+        편의 문제가 아니라 <b>흡수·노출 문제</b>이고, 알림 앱이 아니라 제형이 푸는 종류다.
+      </div>
+    </div>
+    <div class="card risk">
+      <div class="card-h"><div class="card-t">실패 — Lp(a) 표적 계열이 흔들렸다</div><div class="vd v-risk">2026.09.04 3상 실패</div></div>
+      <div class="card-m">Lp(a)HORIZON · 펠라카르센 · 노바티스 · N=8,300+</div>
+      <div class="card-b">
+        확립된 심혈관질환과 높은 Lp(a)를 가진 환자에서 <b>심혈관 사망·비치명적 심근경색·비치명적 뇌졸중·긴급 관상동맥 재개통술 복합 위험을 감소시키지 못했다.</b>
+        약물은 Lp(a)를 실제로 낮췄으나 임상 결과로 이어지지 않았다.<br><br>
+        <b>2026 개정 지침이 Lp(a) 50mg/dL 이상을 위험강화인자로 새로 넣은 직후</b>에 나온 결과다 —
+        <b>표지자로서의 가치와 표적으로서의 가치는 다르다</b>는 것이 8,300명 규모로 확인된 셈이다. 현재 FDA 승인된 Lp(a) 표적 약물은 없다.
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sec"><span class="n">02</span> 치료 축별 스크리닝 <span class="small">· 개발·최근승인 8건 · 축은 기전으로 고정</span></h3>
+
+  <div class="axis ax-ldl">
+    <div class="axis-h"><div class="t">💊 ① LDL-C 저하</div><div class="b">경구화 · 신기전 — 3건</div></div>
+    <div class="axis-b">
+      <div class="pc mkt">
+        <div class="pc-t">Enlicitide decanoate <span class="mech">경구 PCSK9 억제</span></div>
+        <div class="pc-o"><span class="cc">US</span>MSD <em>(미국)</em></div>
+        <div class="pc-b">
+          <b>최초이자 현재 유일한 경구 PCSK9 억제제</b> · 1일 1회 20mg · 제품명 LIPFENDRA<sup>®</sup> · LDL-C 약 60% 감소(CORALreef 3상)·ApoB 50%+ · FDA National Priority Voucher(2025.12)로 심사 단축<br>
+          <b>한계는 효능이 아니라 복용 조건</b> — 아침 공복 + 30분 금식
+        </div>
+        <span class="pcb pb-m">시판(미국) · 2026.07.16</span>
+        <span class="tag t-chk">⑤탭 특허 게이트 · 만료 트리거</span>
+      </div>
+      <div class="pc p3">
+        <div class="pc-t">Obicetrapib <span class="mech">선택적 CETP 억제</span></div>
+        <div class="pc-o"><span class="cc">NL·US</span>NewAmsterdam Pharma <em>(네덜란드·미국) · Menarini 파트너</em></div>
+        <div class="pc-b">
+          1일 1회 경구 10mg · BROADWAY(N=2,530) 84일 LDL-C <b>위약 대비 −29.9%</b> · 최대내약용량 치료 위에 얹는 구조 · <b>LDL·ApoB·Lp(a)를 함께 낮추면서 HDL 상승</b> · 간·근육·혈당 독성 신호 없음 · PREVAIL CVOT 진행 · EMA 승인 2H26 예상
+        </div>
+        <span class="pcb pb-3">Phase 3 · 허가심사</span>
+        <span class="tag t-chk">⑥탭 대기 트랙</span>
+      </div>
+      <div class="pc p3">
+        <div class="pc-t">Obicetrapib + Ezetimibe <span class="mech">고정용량 복합(FDC)</span></div>
+        <div class="pc-o"><span class="cc">NL</span>NewAmsterdam Pharma <em>(네덜란드)</em></div>
+        <div class="pc-b">
+          10mg + 10mg · TANDEM(N=407) LDL-C <b>복합제 −48.6%</b> vs 에제티미브 단독 −27.9% vs 오베체트라핍 단독 −16.8% · RUBENS 3상(대사증후군·T2DM) 톱라인 2026 말<br>
+          <b>조합이 글로벌 개발 축이라는 직접 증거</b> — ⑤탭 A트랙 논리의 근거가 여기 있다
+        </div>
+        <span class="pcb pb-3">Phase 3</span>
+        <span class="tag t-chk">⑤탭 A트랙 근거</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="axis ax-lpa">
+    <div class="axis-h"><div class="t">🧬 ② Lp(a) 저하</div><div class="b">신영역 — 최대 격전지 · 5건</div></div>
+    <div class="axis-b">
+      <div class="pc fail">
+        <div class="pc-t">Pelacarsen <span class="mech">ASO</span></div>
+        <div class="pc-o"><span class="cc">US·CH</span>Ionis / Novartis <em>(미국·스위스)</em></div>
+        <div class="pc-b">
+          2세대 안티센스 · 월 1회 SC 80mg · Lp(a)HORIZON CVOT(N=8,323) · <b>2026.09.04 1차 평가변수 실패</b> · 계열 선두였고 허가신청이 2026 하반기로 예정돼 있었다 · <b>Lp(a)는 낮췄으나 심혈관 사건은 줄지 않았다</b>
+        </div>
+        <span class="pcb pb-f">Phase 3 · 1차 실패</span>
+      </div>
+      <div class="pc p3">
+        <div class="pc-t">Olpasiran <span class="mech">siRNA</span></div>
+        <div class="pc-o"><span class="cc">US</span>Amgen <em>(미국)</em></div>
+        <div class="pc-b">
+          12주 1회 SC · Lp(a) <b>95%+ 감소</b> · OCEAN(a) CVOT(N≈7,000) · 결과 2026~27<br>
+          HORIZON 실패 이후 <b>이 계열의 다음 답이 여기서 나온다</b> — 가장 먼저 도착하는 분기점
+        </div>
+        <span class="pcb pb-3">Phase 3 · 2026~27</span>
+      </div>
+      <div class="pc p3">
+        <div class="pc-t">Lepodisiran <span class="mech">장기지속 siRNA</span></div>
+        <div class="pc-o"><span class="cc">US</span>Eli Lilly <em>(미국)</em></div>
+        <div class="pc-b">
+          6개월 1회 투여 가능 · Lp(a) <b>94% 감소</b>(2상) · ACCLAIM-Lp(a) CVOT(<b>N=16,700 — 최대 규모, HORIZON의 약 두 배</b>) · 완료 2029<br>
+          <b>가장 늦게 오지만 가장 결정적인 답</b>이 될 수 있다
+        </div>
+        <span class="pcb pb-3">Phase 3 · 2029</span>
+      </div>
+      <div class="pc p3">
+        <div class="pc-t">Muvalaplin <span class="mech">경구 Lp(a) 억제 · 소분자</span></div>
+        <div class="pc-o"><span class="cc">US</span>Eli Lilly <em>(미국)</em></div>
+        <div class="pc-b">
+          <b>최초의 경구 Lp(a) 억제제</b> · 240mg 1일 1회 · Lp(a) <b>86% 감소</b> · MOVE-Lp(a) 3상(N=10,450)<br>
+          <b>ASO·siRNA와 모달리티가 완전히 다르다</b> — HORIZON에서 실패한 것은 ASO이지 경구 소분자가 아니다 · 계열이 되살아난다면 <b>국내에서 가장 쓸모 있는 형태</b>
+        </div>
+        <span class="pcb pb-3">Phase 3 · 유일한 경구</span>
+      </div>
+      <div class="pc p2">
+        <div class="pc-t">Zerlasiran <span class="mech">siRNA</span></div>
+        <div class="pc-o"><span class="cc">GB</span>Silence Therapeutics <em>(영국)</em></div>
+        <div class="pc-b">
+          Lp(a) 감소 입증 · FDA 피드백 수령 · <b>3상 진입이 개발 파트너 확보를 조건</b>으로 한다 · HORIZON 결과 이후 파트너 확보가 더 어려워졌을 가능성 — <b>계열 전망을 읽는 지표</b>로 관찰
+        </div>
+        <span class="pcb pb-2">Phase 2 · 파트너 조건</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="call red">
+    <b>Lp(a) 다섯을 한 줄로 묶지 않는다.</b> HORIZON에서 실패한 것은 <b>ASO 한 건</b>이다.
+    남은 넷 중 둘은 siRNA, 하나는 <b>경구 소분자</b>, 하나는 3상 미진입이고, 답이 나오는 시점도
+    <b>2026~27(OCEAN(a)) · MOVE-Lp(a) · 2029(ACCLAIM)</b>으로 갈린다.<br>
+    <b>"계열 전체 배제"로 한 줄 처리하면 서로 다른 세 개의 트리거 날짜가 같이 사라진다.</b>
+    ⑤⑥탭에서 도입·개발 대상으로 내리더라도 <b>이 지도에는 남긴다</b> — 그것이 이 탭의 역할이다.
+  </div>
+
+  <h3 class="sec"><span class="n">03</span> 축별 종합 — 다음에 언제 다시 봐야 하는가</h3>
+  <table>
+    <tr><th style="width:20%">축</th><th style="width:8%">품목</th><th style="width:26%">지금 상태</th><th style="width:26%">다음 분기점</th><th>⑤⑥탭 연결</th></tr>
+    <tr>
+      <td class="k">① LDL-C 저하<br><span class="small">경구화·신기전</span></td>
+      <td><b>3건</b></td>
+      <td>경구 PCSK9 <b>승인 완료</b> · CETP는 심혈관 결과 대기</td>
+      <td><b>RUBENS 톱라인 2026 말</b><br>PREVAIL(오베체트라핍 CVOT)<br>EMA 승인 2H26</td>
+      <td>전부 <b>특허 게이트</b>에 걸린다 — ⑤탭 비제안표에 만료 트리거로 등록</td>
+    </tr>
+    <tr>
+      <td class="k">② Lp(a) 저하</td>
+      <td><b>5건</b></td>
+      <td>ASO 1건 <b>3상 실패</b> · siRNA 2건·경구 1건 진행 · 1건 파트너 대기</td>
+      <td><b>OCEAN(a) 2026~27</b><br>MOVE-Lp(a)<br><b>ACCLAIM 2029</b></td>
+      <td>⑥탭에서 <b>임상 타당성 게이트</b>로 내렸다 — 단 <b>모달리티별로 다시 본다</b></td>
+    </tr>
+    <tr>
+      <td class="k"><span class="small">(참고) 이미 승인·시판</span></td>
+      <td><span class="small">—</span></td>
+      <td colspan="3"><span class="small">벰페도익산(넥스레톨·넥슬리젯) · 인클리시란(렉비오)은 <b>개발 중 품목이 아니므로 이 탭에 싣지 않는다.</b> ②탭 지형도와 ⑥탭 도입 우선순위에서 다룬다 — <b>탭별 수록 대상을 섞지 않는다.</b></span></td>
+    </tr>
+  </table>
+
+  <div class="call">
+    <b>So What — 이 지도가 말하는 것</b><br>
+    새 기전 셋 중 <b>하나는 특허로 닫혔고</b>(경구 PCSK9), <b>하나는 아직 결과가 없고</b>(CETP), <b>하나는 계열이 흔들렸다</b>(Lp(a)).
+    반면 <b>벰페도익산은 승인·심혈관 결과·지침 등재를 모두 마친 상태로 국내에만 없다.</b><br>
+    즉 <b>신물질 전선에서 지금 우리가 할 수 있는 일은 없다.</b> 다만 그 결론을 내리는 것은 ⑤⑥탭이고,
+    이 탭이 주는 것은 <b>언제 다시 봐야 하는지</b>다 — <b>2026 말 · 2026~27 · 2029</b>, 세 개의 날짜다.
+  </div>
+
+  <div class="pgnum">— TAB 4 / 7 —</div>
+</div>
+
+<div class="page" id="pg4">
+  <div class="ph">
+    <div class="ph-eyebrow">TAB 05 · SELF-DEVELOPMENT · 본 문서의 핵심</div>
+    <div class="ph-msg">게이트 아홉 개 중 <em>여덟 개를 통과했고 하나에서 멈췄다</em> —<br>멈춘 곳은 기술이 아니라 <em>판권</em>이다.</div>
+    <div class="ph-sub">A 조합 2건(조건부) · B 형태 자가 포화 · C 분자 비활성 · D 지역갭 A와 중첩 · 게이트 탈락 6건</div>
+  </div>
+
+  <h3 class="sec"><span class="n">01</span> 트랙 배분 요약</h3>
+  <div class="kpis">
+    <div class="kpi"><div class="l">A · 조합(FDC)</div><div class="v" style="color:var(--c-dev)">2</div><div class="d">조건부 — 판권 게이트 미확인</div></div>
+    <div class="kpi"><div class="l">B · 형태</div><div class="v" style="color:var(--c-none)">자가 포화</div><div class="d">자사 2제 4종이 형태 공간을 채움</div></div>
+    <div class="kpi"><div class="l">C · 분자</div><div class="v" style="color:var(--c-none)">비활성</div><div class="d">특허 만료 성분 — 염변경 목적 소멸, 조회하지 않음</div></div>
+    <div class="kpi"><div class="l">D · 지역 갭</div><div class="v" style="color:var(--c-none)">A와 중첩</div><div class="d">넥슬리젯이 A-2와 같은 건 — 별도 계상하지 않음</div></div>
+    <div class="kpi"><div class="l">게이트 탈락</div><div class="v" style="color:var(--c-risk)">6</div><div class="d">자사보유1 · 특허2 · 임상타당성2 · 경쟁밀도1</div></div>
+  </div>
+
+  <h3 class="sec"><span class="n">02</span> 게이트 9개 통과 기록 <span class="n">· 통과/탈락으로만 판정 — 점수에 섞지 않는다</span></h3>
+  <div class="tw" style="overflow-x:auto">
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:17%">게이트</th><th style="width:13%">A-1 3제</th><th style="width:13%">A-2 2제</th><th>판정 근거</th></tr>
+    <tr><td class="k">1</td><td class="k">자사 보유 성분</td><td><span class="gatechip ok">통과</span></td><td><span class="gatechip ok">통과</span></td>
+      <td>A-1은 자사 2제에 <b>성분을 더하는 것</b>이라 대체가 아니라 상위 제품이다. A-2는 <b>스타틴을 빼므로</b> 기존 4종과 경쟁하지 않는다. <span class="small">단, 규격 라인업 확인 후 재판정 — ①탭 트리거 ②</span></td></tr>
+    <tr><td class="k">2</td><td class="k">국내 기허가</td><td><span class="gatechip ok">통과</span></td><td><span class="gatechip ok">통과</span></td>
+      <td>국내 지질 3제 <b>0건</b>. 에제티미브+벰페도익산 2제도 <b>국내 미발매</b>(넥슬리젯은 해외만)</td></tr>
+    <tr><td class="k">3</td><td class="k">특허 개방</td><td><span class="gatechip ok">통과</span></td><td><span class="gatechip ok">통과</span></td>
+      <td>스타틴·에제티미브는 만료. <b>벰페도익산은 원개발사 특허가 존속하나 자체개발이 아니라 성분 도입 후 복합제화</b>이므로 물질특허 회피가 아니라 <b>공급 계약</b>의 문제다 → 게이트 4로 이관</td></tr>
+    <tr><td class="k">4</td><td class="k"><b>판권·원료 접근성</b></td><td><span class="gatechip chk">미확인</span></td><td><span class="gatechip chk">미확인</span></td>
+      <td><b>여기서 멈췄다.</b> 벰페도익산(Esperion) <b>일본 판권은 오츠카제약 독점</b>이 확인된다. 한국 판권 배정 여부는 <b>공개 정보상 확인되지 않음</b> — 배정 사실이 없다는 뜻이 아니라 <b>확인하지 못했다</b>는 뜻이다. 실사 필요</td></tr>
+    <tr><td class="k">5</td><td class="k">자체 제조 가능성</td><td><span class="gatechip ok">통과</span></td><td><span class="gatechip ok">통과</span></td>
+      <td>전부 <b>경구 고형 복합정</b>. 자사가 2제 복합제를 <b>네 번 설계·생산</b>했고 바로에젯은 자체 3상까지 수행했다. 3제는 정량·용출·안정성 설계가 늘지만 <b>모달리티는 동일</b></td></tr>
+    <tr><td class="k">6</td><td class="k">자사 영업 채널</td><td><span class="gatechip ok">통과</span></td><td><span class="gatechip ok">통과</span></td>
+      <td><b>순환기 채널 보유.</b> 여섯 영역 검토 중 채널 게이트를 여유 있게 통과하는 <b>두 번째 사례</b>다(첫 번째는 내분비·비뇨기과)</td></tr>
+    <tr><td class="k">7</td><td class="k">임상적 타당성</td><td><span class="gatechip ok">통과</span></td><td><span class="gatechip ok">통과</span></td>
+      <td>벰페도익산은 <b>CLEAR Outcomes에서 MACE 13% 감소</b>를 입증했고 <b>2026 지침에 Class IIa, Level B로 등재</b>됐다. 세 성분의 기전이 겹치지 않아 <b>상가 효과의 근거가 기전으로 설명된다</b></td></tr>
+    <tr><td class="k">8</td><td class="k">시장 방향</td><td><span class="gatechip ok">통과</span></td><td><span class="gatechip ok">통과</span></td>
+      <td><b>지침이 시장을 만들어 주는 드문 경우.</b> LDL-C 55 대상 확대 + ACS 초기 병용 권고 → <b>2제로 목표에 못 닿는 환자가 구조적으로 증가</b></td></tr>
+    <tr><td class="k">9</td><td class="k">경쟁 밀도</td><td><span class="gatechip ok">통과</span></td><td><span class="gatechip ok">통과</span></td>
+      <td>국내 지질 3제 <b>0건</b>. 고혈압 혼합 3·4제는 한미·JW가 선점했으나 <b>다른 칸</b>이다</td></tr>
+  </table>
+  </div>
+  <div class="call warn">
+    <b>게이트는 삭제가 아니라 라우팅이다.</b> 게이트 4가 <b>부(否)</b>로 확정되면 A-1·A-2는 지우지 않고 다음으로 보낸다 —
+    ① <b>오츠카가 한국까지 보유</b>하면 → <b>제휴·공동판촉 트랙</b>(우리는 순환기 채널을 갖고 있고 그쪽은 제품을 갖고 있다).
+    ② <b>제3자에 배정</b>됐으면 → 그 회사와의 <b>공동개발 트랙</b>.
+    ③ <b>미배정</b>이면 → 자체개발 유지 + 원료 공급 계약 협상.
+    <b>어느 경우에도 "후보 없음"으로 끝나지 않는다.</b>
+  </div>
+
+  <h3 class="sec"><span class="n">03</span> 자체개발 스코어카드 <span class="n">· 게이트를 통과한 것만 · 3기준 15점</span></h3>
+  <div class="score-wrap">
+    <div class="score-hd"><div>후보</div><div>시장성 / 개발난이도(역산) / 차별화강도</div><div style="text-align:right">총점</div><div style="text-align:center">등급</div></div>
+    <div class="score-row">
+      <div class="sr-name">A-1 스타틴+에제티미브+벰페도익산<span>3제 · 트랙 A · 조건부</span></div>
+      <div class="bars">
+        <div class="bar"><div class="bl">시장성</div><div class="bt"><div class="bf" style="width:100%"></div></div></div>
+        <div class="bar"><div class="bl">난이도(역)</div><div class="bt"><div class="bf" style="width:60%;background:#059669"></div></div></div>
+        <div class="bar"><div class="bl">차별화</div><div class="bt"><div class="bf" style="width:100%"></div></div></div>
+      </div>
+      <div class="sr-tot">13</div><div class="grade g-s">S</div>
+    </div>
+    <div class="score-row">
+      <div class="sr-name">A-2 에제티미브+벰페도익산<span>2제 · 스타틴 불내성 · 조건부</span></div>
+      <div class="bars">
+        <div class="bar"><div class="bl">시장성</div><div class="bt"><div class="bf" style="width:60%"></div></div></div>
+        <div class="bar"><div class="bl">난이도(역)</div><div class="bt"><div class="bf" style="width:80%;background:#059669"></div></div></div>
+        <div class="bar"><div class="bl">차별화</div><div class="bt"><div class="bf" style="width:80%"></div></div></div>
+      </div>
+      <div class="sr-tot">11</div><div class="grade g-a">A</div>
+    </div>
+  </div>
+  <p class="small" style="margin-top:8px">※ 각 기준 5점 만점. <b>개발난이도는 역산</b>(쉬울수록 고점). <b>등급 기준(고정): S 13점 이상 · A 10~12점 · B 7~9점 · C 6점 이하.</b>
+  자사적합성·도입가능성·특허여유는 <b>점수 기준이 아니라 위 02절의 게이트</b>다 — 2026.09 방법론 감사에서 기존 25점 체계의 차별화-총점 상관이 <b>−0.11</b>로 나온 데 따른 개편이며, <b>기존 6종(25점)과 총점을 나란히 비교하지 않는다.</b>
+  <b>차별화 3점 미만은 순위에서 제외</b>하고, 동점이면 차별화가 높은 쪽이 위다.</p>
+
+  <h3 class="sec"><span class="n">04</span> 2축 배치 <span class="n">· 합산 없이 읽기 — 이번 1회 병행 시험</span></h3>
+  <p class="body">감사 결과 <b>합산 가중치를 확정할 근거가 아직 없다</b>고 판단해, 이번 영역은 15점 합산표와 <b>합산하지 않는 2축 배치</b>를 나란히 놓는다. 세로축은 차별화 강도, 가로축은 개발 난이도(오른쪽일수록 쉬움), <b>점 크기는 시장성</b>이다. 회의에서 어느 쪽이 더 쓸모 있었는지 기록한 뒤 합산식을 정한다.</p>
+  <div class="tw" style="padding:14px 10px">
+  <svg class="ax" viewBox="0 0 620 340" role="img" aria-label="차별화 강도와 개발 난이도 2축 배치도">
+    <rect x="330" y="60" width="250" height="110" fill="var(--c-dev)" opacity="0.07"/>
+    <line x1="80" y1="280" x2="580" y2="280" stroke="var(--border2)" stroke-width="1.5"/>
+    <line x1="80" y1="60" x2="80" y2="280" stroke="var(--border2)" stroke-width="1.5"/>
+    <line x1="330" y1="60" x2="330" y2="280" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 4"/>
+    <line x1="80" y1="170" x2="580" y2="170" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 4"/>
+    <text class="axl" x="455" y="78" text-anchor="middle">쉽고 · 차별화 높음 — 최우선</text>
+    <text class="axl" x="330" y="308" text-anchor="middle">개발 난이도(역산) — 오른쪽일수록 쉽다 →</text>
+    <text class="axl" x="30" y="170" text-anchor="middle" transform="rotate(-90 30 170)">차별화 강도 →</text>
+    <text class="axl" x="80" y="296" text-anchor="middle">1</text>
+    <text class="axl" x="330" y="296" text-anchor="middle">3</text>
+    <text class="axl" x="580" y="296" text-anchor="middle">5</text>
+    <text class="axl" x="66" y="284" text-anchor="end">1</text>
+    <text class="axl" x="66" y="174" text-anchor="end">3</text>
+    <text class="axl" x="66" y="64" text-anchor="end">5</text>
+    <line x1="80" y1="170" x2="580" y2="170" stroke="var(--c-risk)" stroke-width="1.5" stroke-dasharray="2 5" opacity="0.5"/>
+    <text class="axl" x="576" y="184" text-anchor="end" style="fill:var(--c-risk)">차별화 3점 미만 — 순위 제외선</text>
+    <circle cx="330" cy="60" r="21" fill="var(--c-own)" opacity="0.85"/>
+    <text class="pt" x="330" y="65" text-anchor="middle" style="fill:#fff">A-1</text>
+    <text class="pt" x="330" y="108" text-anchor="middle">3제 — 시장성 5</text>
+    <circle cx="455" cy="115" r="15" fill="var(--c-dev)" opacity="0.85"/>
+    <text class="pt" x="455" y="120" text-anchor="middle" style="fill:#fff">A-2</text>
+    <text class="pt" x="455" y="148" text-anchor="middle">2제 — 시장성 3</text>
+    <circle cx="455" cy="225" r="18" fill="var(--c-none)" opacity="0.5"/>
+    <text class="pt" x="455" y="230" text-anchor="middle" style="fill:#fff">A-3</text>
+    <text class="pt" x="455" y="260" text-anchor="middle" style="fill:var(--text3)">페노피브레이트 3제 — 제외선 아래</text>
+  </svg>
+  </div>
+  <div class="call">
+    <b>합산표와 2축이 같은 답을 주는가?</b> 순위는 같다(A-1 &gt; A-2). 다만 <b>2축이 하나를 더 보여준다</b> —
+    A-3(페노피브레이트 3제)은 난이도가 A-2와 같고 시장성도 작지 않은데 <b>차별화 제외선 아래에 있다.</b>
+    15점 합산표에서는 이 후보가 <b>표에 아예 나타나지 않아</b> "왜 안 했나"를 설명할 자리가 없었다.
+    <b>2축은 탈락자를 같은 그림 안에 남긴다</b> — 이것이 이번 병행 시험에서 확인할 첫 번째 논점이다.
+  </div>
+
+  <h3 class="sec"><span class="n">05</span> 게이트 탈락 — 검토했으나 제안하지 않는 6건</h3>
+  <div class="tw" style="overflow-x:auto">
+  <table>
+    <tr><th style="width:15%">항목</th><th style="width:11%">탈락 게이트</th><th style="width:30%">하지 않는 이유</th><th style="width:13%">게이트가 풀리면 몇 점</th><th>다시 논의할 조건</th></tr>
+    <tr><td class="k">스타틴+에제티미브 2제 신규</td><td><span class="tag t-no">1 자사 보유</span></td>
+      <td>대웅이 <b>크레젯·리토바젯·바로에젯 세 조합을 모두 판다</b>. 네 번째를 만들면 자기 잠식이다</td>
+      <td><span class="tag t-none">해당 없음</span><br><span class="small">게이트가 풀릴 길이 없다</span></td>
+      <td><b>재논의하지 않는다.</b> 단 자사 품목이 <b>철수</b>하는 경우에 한해 규격 승계 관점에서만 재검토</td></tr>
+    <tr><td class="k">스타틴+에제티미브<br>+페노피브레이트 3제</td><td><span class="tag t-warn">7 임상 타당성</span></td>
+      <td>조합은 성립하고 국내 0건이지만, 페노피브레이트는 <b>LDL 강하 근거가 약한 중성지방 관리 약제</b>다. <b>2026 지침의 방향(LDL을 더 낮춘다)과 어긋난다</b></td>
+      <td class="k">10점<br><span class="small">시장4·난이도4·차별화2</span></td>
+      <td><b>TG 동반 고위험군을 겨냥한 별도 적응증</b>으로 설계하고 그 환자군에서 심혈관 결과 근거가 확보될 때. 자사 <b>바로페노</b>가 그 출발점이 된다</td></tr>
+    <tr><td class="k">엔리시타이드형<br>경구 PCSK9</td><td><span class="tag t-no">3 특허</span></td>
+      <td>MSD Lipfendra가 <b>2026.07.16 FDA 승인</b>으로 계열 최초를 가져갔고 특허가 존속한다</td>
+      <td class="k">14점<br><span class="small">시장5·난이도4·차별화5<br>(특허 만료 가정)</span></td>
+      <td><b>물질특허 만료가 5년 내로 들어올 때.</b> 그때 노릴 지점은 성분이 아니라 <b>아침 공복 + 30분 금식 요구</b>다 — 아비라테론에서 본 것과 같은 결함이다</td></tr>
+    <tr><td class="k">오베체트라핍<br>+에제티미브 FDC</td><td><span class="tag t-no">3 특허</span></td>
+      <td>NewAmsterdam 특허 존속이며 <b>아직 승인되지 않았다</b>. TANDEM(N=407)에서 LDL −48.6%로 유망하나 심혈관 결과가 없다</td>
+      <td class="k">12점<br><span class="small">시장4·난이도4·차별화4</span></td>
+      <td><b>PREVAIL 심혈관 결과 발표 + FDA 승인</b> 두 가지가 모두 확인될 때. 그전까지는 ⑥탭 <b>대기 트랙</b></td></tr>
+    <tr><td class="k">Lp(a) 표적 복합·자체개발</td><td><span class="tag t-no">7 임상 타당성</span></td>
+      <td><b>Lp(a)HORIZON 3상이 2026.09.04 1차 평가변수 실패</b>(N=8,300+). Lp(a)를 낮춰도 심혈관 사건이 줄지 않았다. 모달리티도 ASO·siRNA로 게이트 5 동시 탈락</td>
+      <td><span class="tag t-none">해당 없음</span><br><span class="small">모달리티 게이트 동시 탈락</span></td>
+      <td><b>올파시란 OCEAN(a) 등 후속 3상이 성공</b>해 계열 가설이 되살아날 때. 그때도 자체개발이 아니라 <b>도입 검토</b>로만</td></tr>
+    <tr><td class="k">스타틴 단일제 신규 규격</td><td><span class="tag t-no">9 경쟁 밀도</span></td>
+      <td>제네릭 다수로 <b>가격 경쟁 단계</b>이고, 처방이 단일제에서 복합제로 이동 중이다(③탭 리피토 −2.2% vs 리피토플러스 +48.0%)</td>
+      <td class="k">5점<br><span class="small">시장3·난이도5·차별화1</span></td>
+      <td><b>재논의하지 않는다.</b> 시장 방향 게이트도 함께 닫혀 있다</td></tr>
+  </table>
+  </div>
+
+  <div class="pgnum">— TAB 5 / 7 —</div>
+</div>
+
+<div class="page" id="pg5">
+  <div class="ph">
+    <div class="ph-eyebrow">TAB 06 · IN-LICENSING PRIORITY</div>
+    <div class="ph-msg">도입 후보 넷 중 <em>셋이 게이트에서 걸렸다</em> —<br>남은 하나는 <em>⑤탭과 같은 판권</em>이다. 두 트랙이 한 열쇠를 쓴다.</div>
+    <div class="ph-sub">판권·채널 게이트 선행 → 3기준 15점 · 탈락은 라우팅 · 실행 순서와 트리거</div>
+  </div>
+
+  <h3 class="sec"><span class="n">01</span> 게이트를 먼저 건다 <span class="n">· 점수는 통과한 것만</span></h3>
+  <div class="tw" style="overflow-x:auto">
+  <table>
+    <tr><th style="width:19%">후보</th><th style="width:15%">보유사·국가</th><th style="width:13%">판권 게이트</th><th style="width:11%">채널 게이트</th><th>판정과 라우팅</th></tr>
+    <tr><td class="k">넥스레톨 / 넥슬리젯<br><span class="small">벰페도익산 · 벰페도익산+에제티미브</span></td><td>Esperion Therapeutics<br><span class="small">미국</span></td>
+      <td><span class="gatechip chk">미확인</span><br><span class="small">일본은 오츠카 독점</span></td><td><span class="gatechip ok">통과</span><br><span class="small">순환기</span></td>
+      <td><b>유일한 점수 대상.</b> 판권이 열려 있으면 1순위, 닫혀 있으면 <b>제휴·공동판촉 트랙</b>으로 보낸다 — 제품을 만드는 쪽보다 <b>순환기 채널을 가진 쪽이 유리한 구조</b>다</td></tr>
+    <tr><td class="k">LIPFENDRA<br><span class="small">엔리시타이드 · 경구 PCSK9</span></td><td>MSD<br><span class="small">미국</span></td>
+      <td><span class="gatechip">탈락</span><br><span class="small">다국적사 직접 진입 품목</span></td><td>—</td>
+      <td><b>도입 대상 아님 → 관찰 트랙.</b> 2026.07.16 FDA 승인된 계열 최초 품목을 원개발사가 지역 판권으로 내놓을 이유가 없다. <b>국내 허가 신청 시점과 급여 등재 조건</b>을 관찰 항목으로 등록</td></tr>
+    <tr><td class="k">오베체트라핍<br>+에제티미브 FDC</td><td>NewAmsterdam Pharma<br><span class="small">네덜란드·미국</span></td>
+      <td><span class="gatechip">탈락</span><br><span class="small">미승인 품목</span></td><td>—</td>
+      <td><b>대기 트랙.</b> 미승인 품목의 지역 판권을 지금 사는 것은 <b>규제 리스크를 대신 떠안는 것</b>이다. TKI 검토에서 Xspray 품목을 같은 이유로 내렸고, 그 판단은 이후 2차 CRL로 확인됐다</td></tr>
+    <tr><td class="k">Lp(a) 표적군<br><span class="small">펠라카르센 · 올파시란 등</span></td><td>노바티스 · 암젠 · 릴리 · 사일런스</td>
+      <td>—</td><td>—</td>
+      <td><b>삭제 — 단 계열 전체가 아니라 ASO다.</b> 판권 이전에 <b>임상 타당성 게이트에서 탈락</b>했다 — Lp(a)HORIZON 1차 실패(2026.09.04, N=8,300+). 다만 실패한 것은 <b>ASO 한 건</b>이고, siRNA(OCEAN(a) 2026~27 · ACCLAIM 2029)와 <b>경구 소분자 무발라플린(MOVE-Lp(a))</b>은 답이 아직 없다. <b>모달리티별로 다시 본다</b> — ④탭 축 ② 참조</td></tr>
+  </table>
+  </div>
+
+  <h3 class="sec"><span class="n">02</span> 도입 스코어카드 <span class="n">· 게이트 통과 1건 · 3기준 15점</span></h3>
+  <div class="score-wrap">
+    <div class="score-hd"><div>후보</div><div>시장성 / 임상근거 / 차별화강도</div><div style="text-align:right">총점</div><div style="text-align:center">등급</div></div>
+    <div class="score-row">
+      <div class="sr-name">넥스레톨 / 넥슬리젯<span>Esperion · 벰페도익산 · 조건부</span></div>
+      <div class="bars">
+        <div class="bar"><div class="bl">시장성</div><div class="bt"><div class="bf" style="width:80%"></div></div></div>
+        <div class="bar"><div class="bl">임상근거</div><div class="bt"><div class="bf" style="width:100%;background:#059669"></div></div></div>
+        <div class="bar"><div class="bl">차별화</div><div class="bt"><div class="bf" style="width:100%"></div></div></div>
+      </div>
+      <div class="sr-tot">14</div><div class="grade g-s">S</div>
+    </div>
+  </div>
+  <p class="small" style="margin-top:8px">※ 각 기준 5점 만점. <b>등급 기준(고정): S 13점 이상 · A 10~12점 · B 7~9점 · C 6점 이하.</b>
+  <b>도입가능성은 점수가 아니라 게이트</b>다(위 01절). <b>왜 이 점수인가</b> — 시장성 4: 1.4조 복합제 시장의 상위 세그먼트이나 국내 실판매 데이터 없음. 임상근거 5: CLEAR Outcomes에서 <b>MACE 13% 감소</b>라는 결과변수 근거 + 2026 지침 Class IIa 등재. 차별화 5: <b>스타틴 불내성이라는 대체 불가 환자군</b>과 <b>2제 목표 미달 환자</b> 양쪽을 동시에 연다.</p>
+
+  <div class="call">
+    <b>So What? — 도입과 자체개발이 한 판권에 묶였다</b><br>
+    ⑤탭 A-1·A-2와 ⑥탭 1순위가 <b>전부 벰페도익산 한국 판권</b>에 걸려 있다. 보통은 자체개발이 막히면 도입으로 돌리는데,
+    이 영역은 <b>그 우회로가 같은 문을 지난다</b>. 그래서 이 문서의 실행 항목은 하나로 수렴한다 —
+    <b>판권 상태를 먼저 확인하고, 그 답에 따라 세 갈래 중 하나를 고른다.</b>
+  </div>
+
+  <h3 class="sec"><span class="n">03</span> 실행 순서와 트리거 <span class="n">· 확인 주체·기한 명시</span></h3>
+  <div class="tw" style="overflow-x:auto">
+  <table>
+    <tr><th style="width:11%">시점</th><th style="width:13%">주체</th><th style="width:30%">행동</th><th>판단 기준 / 분기</th></tr>
+    <tr><td class="k">즉시<br><span class="small">~2026.10.31</span></td><td class="k">사업개발</td>
+      <td><b>① Esperion 한국 판권 상태 조회 및 접촉</b><br><span class="small">오츠카의 일본 계약 범위에 한국이 포함되는지 병행 확인</span></td>
+      <td><b>미배정</b> → A-1 자체개발 착수 + 원료 공급 협상. <b>오츠카 보유</b> → 제휴·공동판촉 제안(우리 채널 + 그쪽 제품). <b>제3자 배정</b> → 공동개발 타진. <b>세 경우 모두 다음 행동이 있다</b></td></tr>
+    <tr><td class="k">즉시<br><span class="small">~2026.10.15</span></td><td class="k">PM</td>
+      <td><b>② 자사 4개 품목 규격 라인업 확정</b><br><span class="small">크레젯·리토바젯·바로에젯·바로페노의 함량 규격 전수</span></td>
+      <td>자사 보유 게이트의 <b>정확한 경계</b>가 여기서 정해진다. 고함량 규격이 비어 있으면 <b>B트랙이 다시 열릴 수 있다</b> — 현재는 "자가 포화"로 판정했으나 이는 조합 기준이지 규격 기준이 아니다</td></tr>
+    <tr><td class="k">즉시<br><span class="small">~2026.10.31</span></td><td class="k">PM</td>
+      <td><b>③ 대웅 4종 UBIST 처방액 확보</b></td>
+      <td>시장성 점수의 <b>잠정 표기를 푸는</b> 작업. 자사 점유가 상위 집계에 안 잡히는 이유가 규모인지 집계 기준인지 확인</td></tr>
+    <tr><td class="k">2026 Q4</td><td class="k">개발·법무</td>
+      <td><b>④ 3제 복합제 제제 타당성 사전 검토</b><br><span class="small">벰페도익산 180mg + 에제티미브 10mg + 스타틴의 용출·안정성·정제 크기</span></td>
+      <td>①이 열린 뒤에만 착수한다. <b>정제 크기</b>가 실질 관문이 될 수 있다 — 3성분 복합정의 복용 편의가 3제의 존재 이유이므로, 크기가 커지면 <b>차별화 논리 자체가 무너진다</b></td></tr>
+    <tr><td class="k">관찰<br><span class="small">상시</span></td><td class="k">PM</td>
+      <td><b>⑤ 관찰 항목 3건</b></td>
+      <td>· LIPFENDRA 국내 허가 신청·급여 등재 조건<br>· 오베체트라핍 PREVAIL 결과 및 FDA 승인 여부<br>· 올파시란 OCEAN(a) 등 Lp(a) 후속 3상 결과</td></tr>
+  </table>
+  </div>
+
+  <div class="pgnum">— TAB 6 / 7 —</div>
+</div>
+
+<div class="page" id="pg6">
+
+  <div class="ph">
+    <div class="ph-eyebrow">TAB 07 · DIGITAL PRODUCT SCREENING</div>
+    <div class="ph-msg">국내는 <em>네 칸 중 셋이 비어 있고</em>, 해외는 <em>진단기기 쪽만 채워져 있다</em>.<br>그리고 그 비대칭에는 이유가 있다 — <em>Lp(a)는 검사로는 살아 있고 약으로는 죽었다.</em></div>
+    <div class="ph-sub">국내 4분류 스크리닝 + 해외 승인 제품 목록 · 허가된 것만 수록 · 0건은 조회처를 함께 적는다 · 2026.09 기준</div>
+  </div>
+
+  <div class="call">
+    <b>국내와 해외는 묻는 질문이 다르므로 축을 다르게 잡는다.</b>
+    <b>국내는 네 분류로 고정</b>한다 — 여기서 알고 싶은 것은 제품 목록이 아니라 <b>어느 칸이 비어 있는가</b>이고, <b>0건 자체가 판단 근거</b>이기 때문이다.
+    <b>해외는 한 축으로 늘어놓고 분류를 라벨로 붙인다</b> — 여기서 알고 싶은 것은 <b>무엇이 존재하는가</b>이고, 분류는 조회 축이 아니라 조회 결과다.
+    네 칸을 해외에도 강제하면 칸을 억지로 채우거나, 반대로 <b>조회하지 않은 채 "국내외 모두 0건"으로 적게 된다.</b>
+  </div>
+
+  <h3 class="sec"><span class="n">01</span> 국내 — 4분류 스크리닝 <span class="small">· 식약처 허가 기준 · 빈 칸은 조회처를 적는다</span></h3>
+  <table>
+    <tr><th style="width:12%">분류</th><th style="width:16%">제품</th><th style="width:14%">개발사·국가</th><th style="width:14%">허가 현황</th><th>내용 · 조회 범위</th><th style="width:11%">판정</th></tr>
+    <tr>
+      <td class="k">디지털<br>의료기기</td>
+      <td colspan="4"><span class="tag t-no">조회했으나 확인되지 않음 — 0건</span> 이상지질혈증을 적응증으로 하는 치료 보조·원격모니터링 소프트웨어가 확인되지 않는다. 국내 심혈관 디지털 의료기기는 <b>부정맥·심부전 모니터링에 집중</b>돼 있다.<br><span class="small"><b>조회 범위:</b> 식약처 허가 보도·제조사 공시·학술 리뷰 공개 검색 2026.09 — <b>식약처 의료기기 허가 DB 직접 조회는 하지 않았다</b></span></td>
+      <td><span class="tag t-no">해당 없음</span></td>
+    </tr>
+    <tr>
+      <td class="k">DTx</td>
+      <td colspan="4"><span class="tag t-no">조회했으나 확인되지 않음 — 0건</span> 국내 식약처 허가 디지털치료기기는 <b>불면증·호흡재활 등에 한정</b>돼 있고, 이상지질혈증·고지혈증을 적응증으로 하는 품목은 확인되지 않는다.<br><span class="small"><b>조회 범위:</b> 식약처 허가 DTx 목록 보도 기준 2026.09</span></td>
+      <td><span class="tag t-no">해당 없음</span></td>
+    </tr>
+    <tr>
+      <td class="k">융복합<br>제품</td>
+      <td colspan="4"><span class="tag t-no">조회했으나 확인되지 않음 — 0건</span> 스타틴·에제티미브 제제에 센서·기기를 결합한 제품이 확인되지 않는다. <b>국내외 통틀어 이 범주의 지질 제품은 없다</b>(해외도 02절 0건).<br><span class="small"><b>조회 범위:</b> 공개 검색 2026.09 · 섭취형 센서(Abilify MyCite형) 선례는 정신과에 한정</span></td>
+      <td><span class="tag t-no">해당 없음</span></td>
+    </tr>
+    <tr>
+      <td class="k">진단기기</td>
+      <td><b>AVIEW CAC</b></td>
+      <td>코어라인소프트<br><span class="small">한국</span></td>
+      <td>FDA 510(k)<br><span class="small">2024 · 고도화 2025.02.18</span></td>
+      <td>AI 기반 <b>관상동맥 석회화(CAC) 정량분석</b>. 심장 CT뿐 아니라 <b>흉부 CT에서도 정량 분석이 가능</b>한 것이 특징. 위험도 분류가 아니라 <b>전문가 측정 수치와 비교하는 방식</b>으로 인증. <span class="tag t-chk">국내 식약처 허가 현황 조회 필요</span></td>
+      <td><span class="tag t-ok">제휴</span><br><span class="small">국산 · 순환기 채널 직결</span></td>
+    </tr>
+    <tr>
+      <td class="k">진단기기</td>
+      <td><b>하트메디플러스</b><br><span class="small">HeartMedi Plus</span></td>
+      <td>에이아이메딕<br><span class="small">한국</span></td>
+      <td>대만 TFDA<br><span class="small">2026.08 의료기기 허가</span></td>
+      <td>심혈관 영상 기반 진단 솔루션. <b>국산 기업이 해외 규제를 먼저 통과한 사례</b>다. <span class="tag t-chk">국내 식약처 허가 현황 조회 필요</span></td>
+      <td><span class="tag t-ok">제휴</span><br><span class="small">국산</span></td>
+    </tr>
+  </table>
+  <p class="small" style="color:var(--text3);line-height:1.7;margin:10px 0 0">
+    ※ 분류 기준 — <b>디지털의료기기</b>: 치료 보조·원격모니터링 소프트웨어(SaMD) / <b>DTx</b>: 질병을 치료하는 소프트웨어 의료기기 / <b>융복합제품</b>: 의약품에 센서·기기가 결합된 제품 / <b>진단기기</b>: 동반진단·유전자검사·AI 영상·액체생검.
+    빈 칸은 "아직 못 찾았다"가 아니라 <b>"어디를 어떻게 조회했고 나오지 않았다"</b>는 뜻이다 — 그래서 조회 범위를 같이 적는다.
+  </p>
+
+  <h3 class="sec"><span class="n">02</span> 해외 — 승인 제품 목록 <span class="small">· 한 축으로 늘어놓고 분류를 라벨로 붙인다 · 5건</span></h3>
+  <table>
+    <tr><th style="width:16%">제품</th><th style="width:14%">개발사·국가</th><th style="width:13%">규제기관·시점</th><th style="width:10%">분류</th><th>무엇이 중요한가</th><th style="width:12%">국내 대응</th></tr>
+    <tr>
+      <td class="k">Tina-quant<br>Lipoprotein(a) Gen.2<br><span class="small">Molarity assay</span></td>
+      <td>Roche Diagnostics<br><span class="small">스위스·미국</span></td>
+      <td><b>FDA 510(k)</b><br>2025.01.29</td>
+      <td><span class="tag t-kr">진단기기</span></td>
+      <td>미국 <b>최초의 몰농도(nmol/L) 단위 Lp(a) 혈액검사</b>. Lp(a) 입자는 크기가 제각각이라 질량 단위로 재면 크기 차이가 값에 섞이는데, <b>입자 수로 재면 그 오차가 사라진다.</b> cobas c 분석기에서 구동. <b>2026 지침이 Lp(a)를 위험강화인자로 넣은 것과 정확히 맞물린다.</b></td>
+      <td><span class="tag t-chk">국내 도입 현황 확인 필요</span></td>
+    </tr>
+    <tr>
+      <td class="k">Heartflow<br>Plaque Analysis<br><span class="small">Next Gen</span></td>
+      <td>Heartflow, Inc.<br><span class="small">미국</span></td>
+      <td><b>FDA 510(k)</b><br>2025.09.22</td>
+      <td><span class="tag t-kr">진단기기</span></td>
+      <td>CT에서 <b>플라크의 종류·부피·분포를 3D 색상으로 정량</b>. 약 273,000례 학습 · 이전 세대 대비 검출 21% 개선 · <b>IVUS와 95% 일치</b>. UnitedHealthcare에 이어 <b>Cigna가 2025.10 급여 적용</b> — 급여가 붙기 시작한 것이 이 계열의 분기점이다.</td>
+      <td><span class="tag t-no">국내 미확인</span></td>
+    </tr>
+    <tr>
+      <td class="k">PlaqueIQ</td>
+      <td>Elucid<br><span class="small">미국</span></td>
+      <td><b>FDA 510(k)</b><br>2024.10.01</td>
+      <td><span class="tag t-kr">진단기기</span></td>
+      <td>비석회화 플라크와 그 구성, 특히 <b>지질풍부괴사핵(LRNC)</b>을 CTA에서 정량한다. <b>이 목록에서 "지질"과 직접 이어지는 유일한 제품</b>이다 — 석회 점수가 아니라 <b>플라크 안의 지질을 본다.</b></td>
+      <td><span class="tag t-no">국내 미확인</span></td>
+    </tr>
+    <tr>
+      <td class="k">Salix<br>Coronary Plaque module</td>
+      <td>Artrya Limited<br><span class="small">호주</span></td>
+      <td><b>FDA 510(k)</b><br>2025.08.21</td>
+      <td><span class="tag t-kr">진단기기</span></td>
+      <td>관상동맥 CT에서 <b>고위험 플라크를 10분 내 현장(point-of-care)에서 판정</b>. 기존 Coronary Anatomy 플랫폼에 모듈로 붙어 여러 시스템을 오갈 필요가 없다.</td>
+      <td><span class="tag t-no">국내 미확인</span></td>
+    </tr>
+    <tr>
+      <td class="k">디지털의료기기 ·<br>DTx · 융복합제품</td>
+      <td colspan="4"><span class="tag t-no">조회했으나 확인되지 않음 — 0건</span> <b>이상지질혈증을 적응증으로 허가받은 해외 DTx·융복합제품이 확인되지 않는다.</b> 2026년 리뷰(Frontiers in Digital Health)도 심혈관 예방 디지털치료제의 <b>근거는 고혈압에 가장 강하고 이상지질혈증은 "emerging" 단계</b>라고 정리한다.<br><span class="small"><b>조회 범위:</b> FDA 승인 보도·제조사 공시·학술 리뷰 공개 검색 2026.09 — FDA 510(k)/De Novo DB 직접 조회는 하지 않았다</span></td>
+      <td><span class="tag t-no">해당 없음</span></td>
+    </tr>
+  </table>
+
+  <h3 class="sec"><span class="n">03</span> 핵심 발견 <span class="small">· 승인 전이라 표에 못 올린 것이 하나 있다</span></h3>
+  <div class="call warn">
+    <b>TACTiC — AstraZeneca의 비처방 스타틴 자가선택 웹앱.</b> 소비자가 웹앱에서 자가 문진을 거쳐 <b>처방 없이 로수바스타틴 5mg</b>을 최대 90일분까지 받는 경로를 검증한 시험이다.
+    <b>N=1,196 · 90.7%가 지침대로 올바르게 자가선택 · 98.1%가 적정 사용 · LDL-C −35.5% · 7.1% 이상반응으로 중단</b>(2024.04.08 ACC 발표·JACC 동시 게재).<br><br>
+    <b>이것을 02절 제품 표에 올리지 않았다.</b> FDA 승인 전이기 때문이다 — 이 탭의 규칙은 <b>허가·승인이 확인된 것만 제품 칸에 올리고, 임상·논문 단계는 근거로만 쓴다</b>이다.
+    다만 <b>우리에게는 이 목록에서 가장 중요한 항목일 수 있다</b> — 이것은 진단 도구가 아니라 <b>약의 유통 경로 자체를 바꾸는 소프트웨어</b>이고, 바뀌는 대상이 <b>스타틴</b>이다.
+    <b>①탭 트리거에 관찰 항목으로 등록한다.</b>
+  </div>
+  <div class="call">
+    <b>지침이 약이 아니라 검사의 수요를 만들었다.</b> 2026 개정 지침이 위험강화인자(Risk-Enhancing Factors)를 새로 도입하면서
+    <b>Lp(a) 50mg/dL 이상 · hsCRP 2mg/L 이상 · ApoB 상승</b>이 들어갔다. 이 셋 중 <b>Lp(a)와 ApoB는 기존 지질 패널에 기본으로 들어 있지 않다.</b>
+    그래서 로슈가 <b>2025.01</b>에 몰농도 Lp(a) 검사로 FDA를 통과했고, CAC·플라크 정량 AI 넷이 <b>2024.10 → 2025.08 → 2025.09</b>로 연달아 나왔다.
+    <b>해외 목록이 진단기기로만 채워진 것은 우연이 아니라 지침의 결과다.</b><br><br>
+    <b>④탭과 겹쳐 읽어야 한다.</b> Lp(a)는 <b>위험을 예측하는 표지자로는 지침에 들어갔지만, 낮춰도 사건이 줄지 않는다는 것이 ASO 3상에서 확인됐다</b>(2026.09.04).
+    즉 <b>Lp(a)는 검사로는 살아 있고 약으로는 (적어도 ASO 경로는) 죽었다</b> — 이 비대칭이 <b>치료 쪽 세 칸이 비어 있는데 진단 칸만 열려 있는 이유</b>다.
+  </div>
+
+  <h3 class="sec"><span class="n">04</span> 그래서 무엇을 할 것인가 <span class="small">· 제품이 아닌 방향</span></h3>
+  <p style="font-size:12.5px;color:var(--text2);line-height:1.75;margin:0 0 12px">
+    치료 쪽 세 칸이 국내·해외 모두 비어 있으므로 이 영역에서 디지털 제품을 <b>만들거나 사올 이유는 없다.</b>
+    다만 <b>진단기기 칸은 자사 순환기 채널과 직접 맞물린다</b> — CAC·플라크 정량과 Lp(a)·ApoB 검사는 모두 <b>순환기내과 처방 의료진이 쓰는 도구</b>이고, 우리가 이미 들어가 있는 과다.
+    방향은 제품 개발이 아니라 <b>채널 활용</b>이다.
+  </p>
+  <table>
+    <tr><th style="width:24%">방향</th><th>내용</th></tr>
+    <tr>
+      <td class="k">① 국산 진단기업과의 제휴를 먼저 본다</td>
+      <td>코어라인소프트·에이아이메딕은 <b>국내 기업이라 협상 접근성·언어·실사 난도가 모두 낮다.</b> 해외 4종(로슈·Heartflow·Elucid·Artrya)은 <b>국내 대응이 전부 미확인</b>이라 접촉 자체가 조회부터 시작해야 한다. <b>제품을 만드는 쪽보다 순환기 채널을 가진 쪽이 유리한 구조</b>이므로 도입이 아니라 <b>공동판촉·번들</b>이 자연스럽다. 선행 작업은 <b>양사의 국내 식약처 허가 현황 확인</b>이다</td>
+    </tr>
+    <tr>
+      <td class="k">② 검사−처방 연결 근거를 만든다</td>
+      <td>CAC 점수나 Lp(a) 수치로 고위험으로 재분류된 환자는 <b>LDL-C 55 목표 대상</b>이 되고, 그러면 <b>2제로는 부족한 환자</b>가 된다. ⑤탭 A-1의 대상 환자군이 바로 여기서 정의된다 — <b>진단이 우리 약의 시장을 만든다.</b> 해외 목록 중 <b>Elucid PlaqueIQ가 지질풍부괴사핵을 직접 재는 유일한 제품</b>이라는 점은 이 논리에 가장 가까운 근거다</td>
+    </tr>
+    <tr>
+      <td class="k">③ TACTiC형 접근은 관찰한다</td>
+      <td>비처방 스타틴 자가선택 웹앱이 FDA를 통과하면 <b>스타틴의 유통 경로가 바뀐다.</b> 국내는 제도가 달라 그대로 오지 않지만, <b>우리 주력 계열의 접근 경로를 바꾸는 시도</b>이므로 결과를 봐야 한다. <b>지금 할 일은 없고 등록만 한다.</b></td>
+    </tr>
+    <tr>
+      <td class="k">④ 하지 않을 것</td>
+      <td><b>복약 순응도 앱을 만들지 않는다.</b> 앞선 내분비 검토에서 JAMA Network Open(2024) 무작위시험(N=304)이 <b>순응도 앱의 복약률 개선 실패</b>를 보고했다. 게다가 이상지질혈증은 <b>1일 1회 경구제</b>이고 자사는 이미 복합제로 정제 수를 줄여 왔다 — <b>제형으로 이미 푼 문제를 소프트웨어로 다시 풀려 하지 않는다.</b></td>
+    </tr>
+  </table>
+
+  <h3 class="sec"><span class="n">05</span> 본 문서의 한계 — 먼저 밝힌다</h3>
+  <div class="call red">
+    <b>가장 중요한 하나를 확인하지 못했다.</b> <b>벰페도익산 한국 판권 배정 여부</b>다. 일본이 오츠카 독점이라는 사실만 확인했다.
+    ⑤탭 후보 2건과 ⑥탭 1순위가 <b>전부 이 하나에 걸려 있으므로</b>, 이 문서의 결론은 그 답이 나오기 전까지 <b>조건부다.</b><br><br>
+    <b>자사 데이터 두 가지가 비어 있다.</b> ① 4개 품목의 <b>규격 라인업</b> — 자사 보유 게이트의 경계가 여기서 정해지는데 조합 단위로만 판정했다.
+    ② <b>UBIST 처방액</b> — 대웅 품목이 상위 집계에 나타나지 않아 시장성 점수를 공개자료 기준 잠정치로 두었다. <b>②탭 04절에 무엇이 어떻게 달라지는지 적어 뒀다.</b><br><br>
+    <b>이 탭의 조회는 공개 웹 검색 기반이다.</b> FDA 510(k)/De Novo DB와 식약처 의료기기 허가 DB를 <b>직접 조회하지 않았다</b> — 그래서 0건 칸마다 조회 범위를 적었다.
+    <b>0건을 믿을지 말지는 조회처를 보고 판단해야 한다.</b> DB 직접 조회는 다음 갱신의 선행 과제다.<br><br>
+    <b>3제의 제제 타당성은 검토하지 않았다.</b> 벰페도익산 180mg + 에제티미브 10mg + 스타틴을 한 정에 담을 때의 <b>용출·안정성·정제 크기</b>는 외부 자료로 판단할 수 없다.
+    <b>정제가 지나치게 커지면 3제의 존재 이유인 복용 편의가 사라지므로</b> 이는 기술 검토가 아니라 <b>전제 검토</b>다.<br><br>
+    <b>점수 체계가 이번에 바뀌었다.</b> 15점 체계의 첫 적용이며 <b>합산 가중치는 아직 정하지 않았다.</b> 2축 배치를 병행한 이유가 그것이다.
+    <b>기존 6종(25점)과 총점을 나란히 비교하지 말 것.</b>
+  </div>
+
+  <h3 class="sec"><span class="n">06</span> 근거 출처</h3>
+  <div class="call">
+    <b>진료지침 — 2026 개정</b><br>
+    · 메디칼업저버, <b>국내 이상지질혈증 지침, 개별화된 목표로 초기 강력 치료에 방점</b> — ICoLA 2026(2026.09.10~12) 공개 · 위험강화인자 도입 · LDL-C 55 대상 확대 · ACS 초기 병용 권고<br>
+    · 메디칼업저버, <b>국내 지침 첫 등장 '벰페도익산', 스타틴 미충족 수요 채울 치료옵션</b> — Class IIa, Level B · CLEAR Outcomes MACE −13%<br>
+    · 메디파나뉴스, <b>넓어진 'LDL-C 55' 시대…국내 제약사 복합제 전략 재편</b> — 회사별 복합제 라인업 대조<br><br>
+    <b>국내 시장·경쟁</b><br>
+    · 히트뉴스, <b>3분기 '스타틴' 원외처방 6766억원... 선두 '로수젯' 17.5% 증가</b> — 2024년 3분기 품목별 처방액·성장률<br>
+    · 히트뉴스, <b>'스타틴+중성지방관리' 복합제 시장 경쟁 체제 전환</b> — 프라바페닉스(2012)·스타펜(2019)·로수메가(2017) 허가 연혁<br>
+    · 더퍼블릭, <b>대웅제약 '바로에젯' 출격…이상지질혈증 복합제 '풀 라인업' 완성</b> — 2026.04 출시 · 피타바스타틴 1mg+에제티미브 10mg · 3상 N=129 · 8주 LDL −43.9%<br><br>
+    <b>해외 승인·임상 (의약품)</b><br>
+    · Drugs.com, <b>Lipfendra (enlicitide) FDA Approval History</b> — <b>2026.07.16 승인</b> · 20mg 1일 1회 아침 공복 · 복용 후 30분 금식<br>
+    · AJMC, <b>Enlicitide, Oral PCSK9 Inhibitor, Cuts LDL 60% in CORALreef Trials</b> — CORALreef Lipids(NCT05952856)·HeFH(NCT05952869)<br>
+    · TCTMD, <b>Lp(a)HORIZON: Top-line Results Dash Hopes for Pelacarsen</b> — <b>2026.09.04</b> 1차 평가변수 실패 · N=8,300+<br>
+    · Indian Journal of Cardiovascular Disease in Women, <b>Safety and Efficacy of Novel Agents: Pelacarsen, Obicetrapib, and Beyond</b> — BROADWAY N=2,530 LDL −29.9% · TANDEM N=407 복합제 −48.6%<br>
+    · 메디소비자뉴스, <b>오츠카제약, 콜레스테롤 치료제 '넥스레톨'ㆍ'넥슬리젯' 日 독점 판매</b> — 일본 판권 배정 확인 · <b>한국 판권은 확인되지 않음</b><br><br>
+    <b>디지털 제품 — 국내</b><br>
+    · 이데일리, <b>코어라인 관상동맥석회화 정량분석 AI, 美 인증…FDA 인증 SW 업계 1위</b> — AVIEW CAC · FDA 510(k) 2024, 고도화 2025.02.18<br>
+    · 뉴스핌, <b>에이아이메딕, '하트메디플러스' 대만 TFDA 의료기기 허가</b> (2026.08)<br><br>
+    <b>디지털 제품 — 해외</b><br>
+    · Roche Diagnostics, <a href="https://diagnostics.roche.com/us/en/news-listing/2025/roche-receives-fda-510k-clearance-for-the-first-blood-test-in-the-us-measuring-lpa-in-molar-units.html">FDA 510(k) clearance for the first blood test in the U.S. measuring Lp(a) in molar units</a> — Tina-quant Lp(a) Gen.2 Molarity · <b>2025.01.29</b> · cobas c<br>
+    · DAIC, <a href="https://www.dicardiology.com/content/heartflow-plaque-analysis-platform-receives-fda-510k-clearance">Heartflow Plaque Analysis Platform Receives FDA 510(k) Clearance</a> — <b>2025.09.22</b> · 273,000례 학습 · IVUS 95% 일치 · Cigna 2025.10 급여<br>
+    · Elucid, <a href="https://elucid.com/elucid-receives-u-s-510k-clearance-of-plaqueiq-image-analysis-software-to-aid-cardiovascular-disease-assessment/">Elucid Receives U.S. 510(k) Clearance of PlaqueIQ</a> — <b>2024.10.01</b> · 지질풍부괴사핵(LRNC) 정량<br>
+    · PR Newswire, <a href="https://www.prnewswire.com/news-releases/fda-clearance-of-salix-coronary-plaque-module-302535752.html">FDA clearance of Salix Coronary Plaque module</a> — Artrya(호주) · <b>2025.08.21</b><br>
+    · Cleveland Clinic Newsroom, <a href="https://newsroom.clevelandclinic.org/2024/04/08/cleveland-clinic-led-trial-finds-web-app-technology-effective-in-determining-access-to-cholesterol-lowering-drugs-without-prescription">Web App Technology Effective in Determining Access to Cholesterol-Lowering Drugs Without Prescription</a> — TACTiC · AstraZeneca 후원 · N=1,196 · LDL −35.5% · <b>FDA 승인 전</b><br>
+    · Frontiers in Digital Health(2026), <a href="https://www.frontiersin.org/journals/digital-health/articles/10.3389/fdgth.2026.1915478/full">Digital therapeutics and mHealth applications in cardiovascular prevention</a> — 근거는 고혈압에 가장 강하고 <b>이상지질혈증은 emerging 단계</b><br><br>
+    <b>확인하지 못한 것</b><br>
+    · 벰페도익산 <b>한국 판권</b> 배정 여부 — 공개 정보상 배정 사실이 확인되지 않음(배정되지 않았다는 뜻이 아니다). 실사 필요<br>
+    · 대웅 4개 품목의 <b>규격 라인업</b>과 <b>UBIST 처방액</b> — PM 입력 영역<br>
+    · AVIEW CAC·하트메디플러스의 <b>국내 식약처 허가 현황</b><br>
+    · 해외 진단기기 4종(로슈·Heartflow·Elucid·Artrya)의 <b>국내 도입·허가 현황</b> — 전부 미확인<br>
+    · <b>FDA 510(k)/De Novo DB와 식약처 의료기기 허가 DB 직접 조회</b> — 이번 조회는 공개 웹 검색 기반이다<br>
+    · 렉비오(인클리시란) 약가협상 이후 현황 — 2025.04.03 약평위 조건부 통과 이후 <b>협상 결렬 보도</b>만 확인
+  </div>
+
+  <div class="pgnum">— TAB 7 / 7 —</div>
+</div>
+
+
+</div>
+
+<script>
+function switchTab(idx){
+  document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i===idx)});
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){b.classList.toggle('active',i===idx)});
+  window.scrollTo(0,0);
+}
+</script>
+
+</body>
+</html>
